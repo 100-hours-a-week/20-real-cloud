@@ -4,16 +4,6 @@ about: Bug Template
 title: ''
 labels: ''
 assignees: ''
-
----
-
----
-name: "\U0001F41B[bug]"
-about: 버그 발생시에 관련한 이슈 사항입니다.
-title: "\U0001F41B[bug]"
-labels: ''
-assignees: ''
-
 ---
 
 # 🐞 버그/에러 개요
