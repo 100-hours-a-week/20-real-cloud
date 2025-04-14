@@ -4,16 +4,6 @@ about: Feature Template
 title: ''
 labels: ''
 assignees: ''
-
----
-
----
-name: "\U0001F680 [feature]"
-about: 기능 추가시에 적는 템플릿 입니다
-title: "\U0001F680 [feature]"
-labels: ''
-assignees: ''
-
 ---
 
 # 🤖 기능 개요
