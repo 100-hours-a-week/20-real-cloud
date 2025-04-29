@@ -228,7 +228,7 @@ cidr_block = "10.1.0.0/16"
 
 ##### 예시
 
-```
+```hcl
 provider "aws" {
 	region = "ap-northeast-2"
 	profile = "personal"
@@ -247,7 +247,7 @@ provider "google" {
 - 모든 팀원은 같은 Terraform CLI 버전 및 Provider 버전을 사용
 
 ##### 예시
-```
+```hcl
 terraform {
   required_version = ">= 1.6.0"
 
@@ -276,6 +276,7 @@ terraform {
 ### Tag Rule
 ```hcl
 tags = {
+  Name        = "ktb-20-terraform-vpc-v1"
   Project     = "choon-assistant"
   Environment = "mvp"        # v1은 mvp, 이후 버전은 dev, prod 등으로 구분
   Module      = "network"    # 모듈명 (network, compute, database, security, monitoring 등)
