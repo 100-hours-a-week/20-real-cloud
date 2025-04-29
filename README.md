@@ -135,18 +135,23 @@ resource "aws_nat_gateway" "this" {
 
 1. 변수를 만들 때, 작업 중인 리소스에 대한 "Argument Reference" 섹션에 정의된 대로 변수에 대한 `name`, `description`, 및 `default` 값을 사용
 	- 참고: https://registry.terraform.io/providers/hashicorp/aws/latest/docs
-2. 유형이 `list(...)` 또는 `map(...)`인 경우 변수 이름에 복수형을 사용
-3. 분명하다고 생각되더라도 항상 모든 변수에 대해 `description`을 포함
-4. 각 키에 엄격한 제약을 적용하 필요가 없는 한 `object()`와 같은 특정 유형보다는 간단한 유형(`number`, `string`, `list(...)`, `map(...)`, `any`)을 사용
+2. 변수 명의 적합한 구조는 `{name}_{attribute}`이다
+	- `{name}`은 리소스 또는 데이터 소스 이름
+		- `aws_subnet`의 `{name}`은 `subnet` / `aws_vpc`의 `{name}`은 `vpc` / `aws_security_group`의 `{name}`은 `security_group` 등
+	- `{attribute}`는 변수에 지정되는 속성
+		- VPC의 ID는 `id` / RDS 엔드포인트는 `endpoint` 등
+4. 유형이 `list(...)` 또는 `map(...)`인 경우 변수 이름에 복수형을 사용
+5. 분명하다고 생각되더라도 항상 모든 변수에 대해 `description`을 포함
+6. 각 키에 엄격한 제약을 적용하 필요가 없는 한 `object()`와 같은 특정 유형보다는 간단한 유형(`number`, `string`, `list(...)`, `map(...)`, `any`)을 사용
 
 #### 출력(outputs)
 
 기본적으로 모듈의 범위 밖에서도 출력을 일관되고 이해하기 쉽게 만들어야 함(반환되는 값의 유형과 속성 명확하게)
-1. 출력 이름의 적합한 구조는 `{name}_{type}_{attribute}`이다
+1. 출력 명의 적합한 구조는 `{name}_{attribute}`이다
 	- `{name}`은 리소스 또는 데이터 소스 이름
-		- `aws_subnet`의 `{name}`은 `subnet` / `aws_vpc`의 `{name}`은 `vpc`
-	- `{type}`은 리소스 소스의 유형
-	- `{attribute}`는 출력이 반환하는 속성 (optional)
+		- `aws_subnet`의 `{name}`은 `subnet` / `aws_vpc`의 `{name}`은 `vpc` / `aws_security_group`의 `{name}`은 `security_group` 등
+	- `{attribute}`는 출력이 반환하는 속성
+		- VPC의 ID는 `id` / RDS 엔드포인트는 `endpoint` 등
 2. 반환된 값이 리스트인 경우 복수형 이름을 가져야 함
 3. 분명하다고 생각되더라도 항상 모든 변수에 대한 `description`을 포함
 
