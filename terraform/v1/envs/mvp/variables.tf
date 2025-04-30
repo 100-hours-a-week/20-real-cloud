@@ -65,3 +65,32 @@ variable "egress_rules" {
   }))
   default = []
 }
+
+variable "name_prefix" {
+  description = "Name tag's prefix"
+  type        = string
+  default     = "KTB-CA"
+}
+
+variable "project_tag" {
+  description = "Write down Project Name Tag"
+  type        = string
+  default     = "choon-assistant"
+}
+
+variable "environment_tag" {
+  description = "Write down Project Environment Tag"
+  type        = string
+  default     = "mvp"
+}
+
+variable "version_tag" {
+  description = "Write down Project Version Tag"
+  type        = string
+  default     = "v1"
+}
+
+variable "assignee_tag" {
+  description = "Write down Assignee Tag"
+  type        = string
+}
