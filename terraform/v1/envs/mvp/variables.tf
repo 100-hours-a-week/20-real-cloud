@@ -82,3 +82,16 @@ variable "assignee_tag" {
   description = "Write down Assignee Tag"
   type        = string
 }
+
+#cdn
+variable "acm_certificate_arn" {
+  description = "The ARN of the ACM certificate to use for HTTPS"
+  type        = string
+}
+
+variable "domain_name" {
+  description = "The custom domain name (CNAME) to associate with the CloudFront distribution"
+  type        = string
+}
+
+#storage
