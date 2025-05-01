@@ -1,4 +1,4 @@
-# Network 관련 outputs
+# Network
 output "vpc_id" {
   description = "Default VPC ID"
   value       = module.network.vpc_id
@@ -9,6 +9,7 @@ output "public_subnet_id" {
   value       = module.network.public_subnet_id
 }
 
+# Security
 output "security_group_id" {
   description = "Security Group with traffic control rules"
   value       = module.security.security_group_id
