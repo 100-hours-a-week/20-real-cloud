@@ -54,6 +54,7 @@ variable "egress_rules" {
   default = []
 }
 
+# Tags
 variable "name_prefix" {
   description = "Name tag's prefix"
   type        = string

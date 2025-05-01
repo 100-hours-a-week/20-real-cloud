@@ -1,17 +1,3 @@
-terraform {
-  required_version = ">= 1.6.0"
-
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
-# 추후 모듈 개발시, versions.tf로 해당 내용 이관
-
-# network 관련 코드
 module "network" {
   source = "../../modules/network"
 
@@ -27,7 +13,7 @@ module "network" {
 module "security" {
   source = "../../modules/security"
   
-  vpc_id                     = module.network.vpc_id
+  vpc_id = module.network.vpc_id
 
   ingress_rules = var.ingress_rules
   egress_rules  = var.egress_rules
