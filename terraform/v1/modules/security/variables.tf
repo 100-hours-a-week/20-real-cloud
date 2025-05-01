@@ -1,15 +1,3 @@
-variable "security_group_name" {
-  description = "Security Group Name"
-  type        = string
-  default     = ""
-}
-
-variable "security_group_description" {
-  description = "Security Group Description"
-  type        = string
-  default     = ""
-}
-
 variable "vpc_id" {
   description = "VPC ID to associate with security group"
   type        = string
@@ -38,4 +26,20 @@ variable "egress_rules" {
     cidr_blocks = list(string)
   }))
   default = []
+}
+
+variable "module_name" {
+  description = "Module name used for Module tag"
+  type        = string
+  default     = "security"
+}
+
+variable "common_tags" {
+  description = "Common tags"
+  type        = map(string)
+}
+
+variable "name_prefix" {
+  description = "Name tag's prefix"
+  type        = string
 }

@@ -24,18 +24,6 @@ variable "gcp_cidr_block" {
 }
 
 # Security
-variable "security_group_name" {
-  description = "Security Group Name"
-  type        = string
-  default     = ""
-}
-
-variable "security_group_description" {
-  description = "Security Group Description"
-  type        = string
-  default     = ""
-}
-
 variable "vpc_id" {
   description = "VPC ID to associate with security group"
   type        = string
