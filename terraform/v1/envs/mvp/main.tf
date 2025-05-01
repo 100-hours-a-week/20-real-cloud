@@ -26,9 +26,7 @@ module "network" {
 
 module "security" {
   source = "../../modules/security"
-
-  security_group_name        = var.security_group_name
-  security_group_description = var.security_group_description
+  
   vpc_id                     = module.network.vpc_id
 
   ingress_rules = var.ingress_rules

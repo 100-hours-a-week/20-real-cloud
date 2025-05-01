@@ -1,7 +1,12 @@
 resource "aws_security_group" "this" {
-  name        = var.security_group_name
-  description = var.security_group_description
   vpc_id      = var.vpc_id
+
+  tags = merge(
+    local.default_tags,
+    {
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-securuty-group"
+    }
+  )
 }
 
 # Ingress Rules

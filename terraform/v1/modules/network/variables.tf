@@ -21,3 +21,19 @@ variable "gcp_cidr_block" {
   type        = string
   default     = ""
 }
+
+variable "module_name" {
+  description = "Module name used for Module tag"
+  type        = string
+  default     = "network"
+}
+
+variable "common_tags" {
+  description = "공통 태그"
+  type        = map(string)
+}
+
+variable "name_prefix" {
+  description = "Name tag's prefix"
+  type        = string
+}
