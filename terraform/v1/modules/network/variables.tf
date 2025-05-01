@@ -22,6 +22,7 @@ variable "gcp_cidr_block" {
   default     = ""
 }
 
+# Tags
 variable "module_name" {
   description = "Module name used for Module tag"
   type        = string

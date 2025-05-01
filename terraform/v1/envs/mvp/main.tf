@@ -6,6 +6,8 @@ module "network" {
   availability_zone        = var.availability_zone
   gcp_cidr_block           = var.gcp_cidr_block
 
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
 }
 
 module "security" {
@@ -15,6 +17,9 @@ module "security" {
 
   ingress_rules = var.ingress_rules
   egress_rules  = var.egress_rules
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
 }
 
 module "storage" {
