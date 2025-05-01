@@ -74,7 +74,7 @@ resource "aws_cloudfront_distribution" "frontend" {
   tags = merge(
     local.default_tags,
     {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-vpc"
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-cloudfront"
     }
   )
 
