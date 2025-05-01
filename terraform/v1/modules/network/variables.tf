@@ -22,6 +22,7 @@ variable "gcp_cidr_block" {
   default     = ""
 }
 
+# Tags
 variable "module_name" {
   description = "Module name used for Module tag"
   type        = string
@@ -29,7 +30,7 @@ variable "module_name" {
 }
 
 variable "common_tags" {
-  description = "공통 태그"
+  description = "Common Tags"
   type        = map(string)
 }
 
