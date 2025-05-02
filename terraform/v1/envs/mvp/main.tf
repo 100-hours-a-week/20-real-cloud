@@ -47,3 +47,19 @@ module "cdn" {
   name_prefix = local.name_prefix
 
 }
+
+module "compute" {
+  source = "../../modules/compute"
+
+  ami_id                               = var.ami_id
+  instance_type                        = var.instance_type
+  subnet_id                            = module.network.public_subnet_id
+  vpc_id                               = module.network.vpc_id
+  key_name                             = var.key_name
+  instance_security_group_ids          = [module.security.security_group_id]
+  instance_associate_public_ip_address = var.instance_associate_public_ip_address
+  iam_instance_profile                 = module.security.s3_reader_writer_iam_instance_profile_name
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
