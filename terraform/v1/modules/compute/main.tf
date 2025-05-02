@@ -5,6 +5,8 @@ resource "aws_instance" "ec2" {
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
   associate_public_ip_address = var.instance_associate_public_ip_address
+  iam_instance_profile        = var.iam_instance_profile
+
 
   tags = merge(
     local.default_tags,

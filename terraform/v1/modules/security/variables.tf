@@ -28,6 +28,7 @@ variable "egress_rules" {
   default = []
 }
 
+
 # Tags
 variable "module_name" {
   description = "Module name used for Module tag"
