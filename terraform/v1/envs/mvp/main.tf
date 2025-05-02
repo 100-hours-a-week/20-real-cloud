@@ -27,7 +27,6 @@ module "storage" {
   s3_frontend_bucket_name = var.domain_name
 
   s3_reader_writer_iam_role_arn  = module.security.s3_reader_writer_iam_role_arn
-  s3_reader_writer_iam_role_name = module.security.s3_reader_writer_iam_role_name
   s3_image_prefix            = var.s3_image_prefix
   s3_log_prefix              = var.s3_log_prefix
   s3_log_retention_days      = var.s3_log_retention_days

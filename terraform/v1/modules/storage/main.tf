@@ -84,61 +84,27 @@ resource "aws_s3_bucket_policy" "s3_reader_writer_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid       = "AllowImageRead"
+        Sid       = "AllowImageFullAccess"
         Effect    = "Allow"
         Principal = { AWS = var.s3_reader_writer_iam_role_arn }
-        Action    = ["s3:ListBucket", "s3:GetObject"]
+        Action = [
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
         Resource = [
           aws_s3_bucket.backend.arn,
           "${aws_s3_bucket.backend.arn}/${var.s3_image_prefix}/*"
         ]
       },
       {
-        Sid       = "AllowLogWriteReadDelete"
+        Sid       = "AllowLogWriteOnly"
         Effect    = "Allow"
         Principal = { AWS = var.s3_reader_writer_iam_role_arn }
-        Action    = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"]
+        Action    = ["s3:PutObject"]
         Resource  = "${aws_s3_bucket.backend.arn}/${var.s3_log_prefix}/*"
       }
     ]
   })
-}
-
-
-data "aws_iam_policy_document" "s3_reader_writer_policy" {
-  statement {
-    sid    = "AllowImageRead"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = [var.s3_reader_writer_iam_role_arn]
-    }
-
-    actions = ["s3:ListBucket", "s3:GetObject"]
-    resources = [
-      aws_s3_bucket.backend.arn,
-      "${aws_s3_bucket.backend.arn}/${var.s3_image_prefix}/*",
-    ]
-  }
-
-  statement {
-    sid    = "AllowLogWriteReadDelete"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = [var.s3_reader_writer_iam_role_arn]
-    }
-
-    actions = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"]
-    resources = [
-      "${aws_s3_bucket.backend.arn}/${var.s3_log_prefix}/*",
-    ]
-  }
-}
-resource "aws_iam_role_policy" "s3_reader_writer_inline" {
-  name   = "${var.name_prefix}-${var.common_tags.Environment}-s3-reader-writer-inline"
-  role   = var.s3_reader_writer_iam_role_name
-  policy = data.aws_iam_policy_document.s3_reader_writer_policy.json
 }

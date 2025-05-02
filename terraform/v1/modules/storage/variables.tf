@@ -9,10 +9,6 @@ variable "s3_reader_writer_iam_role_arn" {
   description = "IAM role ARN that can read images and write/read/delete logs"
   type        = string
 }
-variable "s3_reader_writer_iam_role_name" {
-  description = "IAM role name that can read images and write/read/delete logs"
-  type        = string
-}
 
 variable "s3_image_prefix" {
   description = "Key prefix within the bucket for static images"
