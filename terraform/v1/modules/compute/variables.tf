@@ -27,3 +27,8 @@ variable "instance_associate_public_ip_address" {
   description = "Whether to associate a public IP address with the instance."
   type        = bool
 }
+
+variable "iam_instance_profile" {
+  description = "iam profile"
+  type        = bool
+}
