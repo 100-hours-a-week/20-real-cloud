@@ -11,7 +11,7 @@ resource "aws_instance" "ec2" {
   tags = merge(
     local.default_tags,
     {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-vpc"
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-instance"
     }
   )
 }
