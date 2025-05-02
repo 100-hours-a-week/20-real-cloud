@@ -110,3 +110,24 @@ variable "s3_log_retention_days" {
   description = "Number of days to retain objects under the log prefix before expiration"
   type        = number
 }
+
+#compute
+variable "ami_id" {
+  description = "The AMI ID for the instance."
+  type        = string
+}
+
+variable "instance_type" {
+  description = "EC2 instance type."
+  type        = string
+}
+
+variable "key_name" {
+  description = "The key pair name to use for SSH access."
+  type        = string
+}
+
+variable "instance_associate_public_ip_address" {
+  description = "Whether to associate a public IP address with the instance."
+  type        = bool
+}

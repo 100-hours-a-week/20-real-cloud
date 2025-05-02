@@ -3,7 +3,7 @@ resource "aws_instance" "ec2" {
   instance_type               = var.instance_type
   subnet_id                   = var.subnet_id
   key_name                    = var.key_name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
+  vpc_security_group_ids      = var.instance_security_group_ids
   associate_public_ip_address = var.instance_associate_public_ip_address
   iam_instance_profile        = var.iam_instance_profile
 
@@ -11,7 +11,7 @@ resource "aws_instance" "ec2" {
   tags = merge(
     local.default_tags,
     {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-vpc"
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-instance"
     }
   )
 }

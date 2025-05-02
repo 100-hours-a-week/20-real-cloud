@@ -23,6 +23,11 @@ variable "key_name" {
   type        = string
 }
 
+variable "instance_security_group_ids" {
+  description = "List of security group IDs to associate with the instance."
+  type        = list(string)
+}
+
 variable "instance_associate_public_ip_address" {
   description = "Whether to associate a public IP address with the instance."
   type        = bool
@@ -30,5 +35,22 @@ variable "instance_associate_public_ip_address" {
 
 variable "iam_instance_profile" {
   description = "iam profile"
-  type        = bool
+  type        = string
+}
+
+# Tags
+variable "module_name" {
+  description = "Module name used for Module tag"
+  type        = string
+  default     = "network"
+}
+
+variable "common_tags" {
+  description = "Common Tags"
+  type        = map(string)
+}
+
+variable "name_prefix" {
+  description = "Name tag's prefix"
+  type        = string
 }
