@@ -30,7 +30,7 @@ variable "vpc_id" {
   default     = ""
 }
 
-variable "ingress_rules" {
+variable "ec2_ingress_rules" {
   description = "Security Group's Ingress rules"
   type = list(object({
     description = string
@@ -42,7 +42,31 @@ variable "ingress_rules" {
   default = []
 }
 
-variable "egress_rules" {
+variable "ec2_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "alb_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "alb_egress_rules" {
   description = "Security Group's Egress rules"
   type = list(object({
     description = string
@@ -130,4 +154,10 @@ variable "key_name" {
 variable "instance_associate_public_ip_address" {
   description = "Whether to associate a public IP address with the instance."
   type        = bool
+}
+
+# alb
+variable "target_group_port" {
+  description = "port number of target group"
+  type        = number
 }

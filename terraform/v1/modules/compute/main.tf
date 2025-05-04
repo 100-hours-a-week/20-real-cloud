@@ -15,3 +15,9 @@ resource "aws_instance" "ec2" {
     }
   )
 }
+
+resource "aws_lb_target_group_attachment" "ec2" {
+  target_group_arn = var.alb_target_group_arn
+  target_id        = aws_instance.ec2.id
+  port             = var.instance_port
+}

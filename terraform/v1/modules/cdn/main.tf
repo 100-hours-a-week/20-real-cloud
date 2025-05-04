@@ -30,31 +30,33 @@ resource "aws_cloudfront_distribution" "frontend" {
   aliases = [var.domain_name]
 
   origin {
-    domain_name = var.bucket_regional_domain_name
-    origin_id   = "s3-origin"
+    domain_name = var.alb_dns_name
+    origin_id   = "alb-origin"
 
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "s3-origin"
+    target_origin_id       = "alb-origin"
+    viewer_protocol_policy = "redirect-to-https"
+
+    allowed_methods = ["GET", "HEAD", "OPTIONS", "POST", "PUT", "DELETE"]
+    cached_methods  = ["GET", "HEAD"]
 
     forwarded_values {
-      query_string = false
-
-      cookies {
-        forward = "none"
-      }
+      query_string = true
+      headers      = ["*"]
+      cookies { forward = "all" }
     }
 
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 0
   }
 
   price_class = "PriceClass_100"
