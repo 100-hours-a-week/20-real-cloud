@@ -13,11 +13,11 @@ resource "aws_cloudfront_distribution" "this" {
 
   aliases = [var.domain_name]
 
- origin {
-  origin_id                  = "s3_origin"
-  domain_name                = var.bucket_regional_domain_name
-  origin_access_control_id  = aws_cloudfront_origin_access_control.static_oac.id
-}
+  origin {
+    origin_id                = "s3_origin"
+    domain_name              = var.bucket_regional_domain_name
+    origin_access_control_id = aws_cloudfront_origin_access_control.static_oac.id
+  }
 
   origin {
     domain_name = var.alb_dns_name
