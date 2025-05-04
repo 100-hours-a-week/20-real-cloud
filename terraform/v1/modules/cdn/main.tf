@@ -13,16 +13,11 @@ resource "aws_cloudfront_distribution" "this" {
 
   aliases = [var.domain_name]
 
-  origin {
-    origin_id   = "s3_origin"
-    domain_name = var.bucket_regional_domain_name
-
-    s3_origin_config {
-      origin_access_identity = null
-    }
-
-    origin_access_control_id = aws_cloudfront_origin_access_control.static_oac.id
-  }
+ origin {
+  origin_id                  = "s3_origin"
+  domain_name                = var.bucket_regional_domain_name
+  origin_access_control_id  = aws_cloudfront_origin_access_control.static_oac.id
+}
 
   origin {
     domain_name = var.alb_dns_name
@@ -40,7 +35,7 @@ resource "aws_cloudfront_distribution" "this" {
     target_origin_id       = "alb_origin"
     viewer_protocol_policy = "redirect-to-https"
 
-    allowed_methods = ["GET", "HEAD", "OPTIONS", "POST", "PUT", "DELETE"]
+    allowed_methods = ["HEAD", "DELETE", "POST", "GET", "OPTIONS", "PUT", "PATCH"]
     cached_methods  = ["GET", "HEAD"]
 
     forwarded_values {

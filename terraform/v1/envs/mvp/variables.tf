@@ -2,19 +2,16 @@
 variable "vpc_cidr_block" {
   description = "VPC CIDR block to which EC2 instance belongs"
   type        = string
-  default     = ""
 }
 
-variable "public_subnet_cidr_block" {
-  description = "Only one Public Subnet CIDR block belonging to the VPC"
-  type        = string
-  default     = ""
+variable "public_subnet_cidr_blocks" {
+  description = "Public Subnet CIDR block belonging to the VPC"
+  type        = list(string)
 }
 
-variable "availability_zone" {
+variable "availability_zones" {
   description = "Availability Zone where public subnet exist"
-  type        = string
-  default     = ""
+  type        = list(string)
 }
 
 variable "gcp_cidr_block" {
@@ -82,7 +79,7 @@ variable "alb_egress_rules" {
 variable "name_prefix" {
   description = "Name tag's prefix"
   type        = string
-  default     = "KTB-CA"
+  default     = "ktb-ca"
 }
 
 variable "project_tag" {
@@ -109,7 +106,11 @@ variable "assignee_tag" {
 }
 
 #cdn
-variable "acm_certificate_arn" {
+variable "us_acm_certificate_arn" {
+  description = "The ARN of the ACM certificate to use for HTTPS"
+  type        = string
+}
+variable "ap_acm_certificate_arn" {
   description = "The ARN of the ACM certificate to use for HTTPS"
   type        = string
 }
