@@ -10,8 +10,8 @@ module "network" {
   name_prefix = local.name_prefix
 }
 
-module "security" {
-  source = "../../modules/security"
+module "ec2_sg" {
+  source = "../../modules/security_group"
 
   vpc_id = module.network.vpc_id
 
@@ -22,11 +22,19 @@ module "security" {
   name_prefix = local.name_prefix
 }
 
+module "iam" {
+  source = "../../modules/iam"
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+
 module "storage" {
   source                  = "../../modules/storage"
   s3_frontend_bucket_name = var.domain_name
 
-  s3_reader_writer_iam_role_arn = module.security.s3_reader_writer_iam_role_arn
+  s3_reader_writer_iam_role_arn = module.iam.s3_reader_writer_iam_role_arn
   s3_image_prefix               = var.s3_image_prefix
   s3_log_prefix                 = var.s3_log_prefix
   s3_log_retention_days         = var.s3_log_retention_days
@@ -56,9 +64,9 @@ module "compute" {
   subnet_id                            = module.network.public_subnet_id
   vpc_id                               = module.network.vpc_id
   key_name                             = var.key_name
-  instance_security_group_ids          = [module.security.security_group_id]
+  instance_security_group_ids          = [module.ec2_sg.security_group_id]
   instance_associate_public_ip_address = var.instance_associate_public_ip_address
-  iam_instance_profile                 = module.security.s3_reader_writer_iam_instance_profile_name
+  iam_instance_profile                 = module.iam.s3_reader_writer_iam_instance_profile_name
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
