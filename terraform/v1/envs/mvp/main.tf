@@ -63,3 +63,16 @@ module "compute" {
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
+
+module "alb" {
+  source           = "../../modules/alb"
+  subnet_ids          = module.network.public_subnet_ids
+  security_group_id = module.security.alb_sg_id
+
+  certificate_arn = var.acm_certificate_arn
+  target_group_vpc_id = module.network.vpc_id
+  target_group_port = var.target_group_port
+
+  common_tags      = local.common_tags
+  name_prefix      = var.name_prefix
+}

@@ -131,3 +131,9 @@ variable "instance_associate_public_ip_address" {
   description = "Whether to associate a public IP address with the instance."
   type        = bool
 }
+
+# alb
+variable "target_group_port" {
+  description = "port number of target group"
+  type        = number
+}
