@@ -15,8 +15,20 @@ module "ec2_sg" {
 
   vpc_id = module.network.vpc_id
 
-  ingress_rules = var.ingress_rules
-  egress_rules  = var.egress_rules
+  ingress_rules = var.ec2_ingress_rules
+  egress_rules  = var.ec2_egress_rules
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+module "alb_sg" {
+  source = "../../modules/security_group"
+
+  vpc_id = module.network.vpc_id
+
+  ingress_rules = var.alb_ingress_rules
+  egress_rules  = var.alb_egress_rules
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -75,7 +87,7 @@ module "compute" {
 module "alb" {
   source           = "../../modules/alb"
   subnet_ids          = module.network.public_subnet_ids
-  security_group_id = module.security.alb_sg_id
+  security_group_id = module.alb_sg.security_group_id
 
   certificate_arn = var.acm_certificate_arn
   target_group_vpc_id = module.network.vpc_id
