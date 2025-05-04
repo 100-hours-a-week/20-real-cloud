@@ -80,19 +80,22 @@ module "compute" {
   instance_associate_public_ip_address = var.instance_associate_public_ip_address
   iam_instance_profile                 = module.iam.s3_reader_writer_iam_instance_profile_name
 
+  alb_target_group_arn = module.alb.target_group_arn
+  instance_port        = var.target_group_port
+
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
 
 module "alb" {
-  source           = "../../modules/alb"
-  subnet_ids          = module.network.public_subnet_ids
+  source            = "../../modules/alb"
+  subnet_ids        = [module.network.public_subnet_id]
   security_group_id = module.alb_sg.security_group_id
 
-  certificate_arn = var.acm_certificate_arn
+  certificate_arn     = var.acm_certificate_arn
   target_group_vpc_id = module.network.vpc_id
-  target_group_port = var.target_group_port
+  target_group_port   = var.target_group_port
 
-  common_tags      = local.common_tags
-  name_prefix      = var.name_prefix
+  common_tags = local.common_tags
+  name_prefix = var.name_prefix
 }
