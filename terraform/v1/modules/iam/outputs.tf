@@ -1,9 +1,3 @@
-output "security_group_id" {
-  description = "Created Security Group ID"
-  value       = aws_security_group.this.id
-}
-
-
 # iam
 output "s3_reader_writer_iam_role_arn" {
   description = "ARN of the combined S3 reader/writer IAM role"

@@ -12,5 +12,5 @@ output "public_subnet_id" {
 # Security
 output "security_group_id" {
   description = "Security Group with traffic control rules"
-  value       = module.security.security_group_id
+  value       = module.ec2_sg.security_group_id
 }
