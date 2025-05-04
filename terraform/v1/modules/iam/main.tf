@@ -11,23 +11,23 @@ data "aws_iam_policy_document" "ec2_assume" {
   }
 }
 
-resource "aws_iam_role" "s3_reader_writer_role" {
-  name               = "${var.name_prefix}-${var.common_tags.Environment}-s3-reader-writer-role"
+resource "aws_iam_role" "s3_role" {
+  name               = "${var.name_prefix}-${var.common_tags.Environment}-s3-role"
   assume_role_policy = data.aws_iam_policy_document.ec2_assume.json
 
   tags = merge(
     local.default_tags,
-    { Name = "${var.name_prefix}-${var.common_tags.Environment}-s3-reader-writer-role" }
+    { Name = "${var.name_prefix}-${var.common_tags.Environment}-s3-role" }
   )
 }
 
-resource "aws_iam_instance_profile" "s3_reader_writer_profile" {
-  name = "${var.name_prefix}-${var.common_tags.Environment}-s3-reader-writer-profile"
-  role = aws_iam_role.s3_reader_writer_role.name
+resource "aws_iam_instance_profile" "s3_profile" {
+  name = "${var.name_prefix}-${var.common_tags.Environment}-s3-profile"
+  role = aws_iam_role.s3_role.name
 
   tags = merge(
     local.default_tags,
-    { Name = "${var.name_prefix}-${var.common_tags.Environment}-s3-reader-writer-profile" }
+    { Name = "${var.name_prefix}-${var.common_tags.Environment}-s3-profile" }
   )
 }
 
