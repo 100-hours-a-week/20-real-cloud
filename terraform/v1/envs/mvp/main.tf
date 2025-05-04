@@ -62,6 +62,7 @@ module "cdn" {
   bucket_regional_domain_name = module.storage.frontend_bucket_regional_domain_name
   domain_name                 = var.domain_name
   acm_certificate_arn         = var.acm_certificate_arn
+  alb_dns_name                = module.alb.alb_dns_name
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix

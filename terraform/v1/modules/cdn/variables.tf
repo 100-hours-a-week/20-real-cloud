@@ -23,6 +23,11 @@ variable "domain_name" {
   type        = string
 }
 
+variable "alb_dns_name" {
+  description = "The DNS name of the ALB to use as the origin for CloudFront"
+  type        = string
+}
+
 
 #tag용 변수
 variable "module_name" {
