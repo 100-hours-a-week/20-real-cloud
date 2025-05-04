@@ -2,6 +2,10 @@
 resource "aws_s3_bucket" "static" {
   bucket = "${var.name_prefix}-${var.common_tags.Environment}-static"
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   tags = merge(
     local.default_tags,
     {
