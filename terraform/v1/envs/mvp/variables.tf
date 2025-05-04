@@ -120,16 +120,6 @@ variable "domain_name" {
 }
 
 #storage
-variable "s3_image_prefix" {
-  description = "Key prefix within the bucket for static images"
-  type        = string
-}
-
-variable "s3_log_prefix" {
-  description = "Key prefix within the bucket for backend logs"
-  type        = string
-}
-
 variable "s3_log_retention_days" {
   description = "Number of days to retain objects under the log prefix before expiration"
   type        = number

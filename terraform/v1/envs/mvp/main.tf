@@ -43,13 +43,10 @@ module "iam" {
 
 
 module "storage" {
-  source                  = "../../modules/storage"
-  s3_frontend_bucket_name = var.domain_name
-
-  s3_reader_writer_iam_role_arn = module.iam.s3_reader_writer_iam_role_arn
-  s3_image_prefix               = var.s3_image_prefix
-  s3_log_prefix                 = var.s3_log_prefix
-  s3_log_retention_days         = var.s3_log_retention_days
+  source                      = "../../modules/storage"
+  s3_iam_role_arn             = module.iam.s3_iam_role_arn
+  s3_log_retention_days       = var.s3_log_retention_days
+  cloudfront_distribution_arn = module.cdn.cloudfront_distribution_arn
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -57,12 +54,11 @@ module "storage" {
 
 module "cdn" {
   source                      = "../../modules/cdn"
-  bucket_name                 = var.domain_name
-  bucket_arn                  = module.storage.frontend_bucket_arn
-  bucket_regional_domain_name = module.storage.frontend_bucket_regional_domain_name
-  domain_name                 = var.domain_name
-  acm_certificate_arn         = var.acm_certificate_arn
-  alb_dns_name                = module.alb.alb_dns_name
+  bucket_regional_domain_name = module.storage.static_bucket_regional_domain_name
+
+  domain_name         = var.domain_name
+  acm_certificate_arn = var.acm_certificate_arn
+  alb_dns_name        = module.alb.alb_dns_name
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -79,7 +75,7 @@ module "compute" {
   key_name                             = var.key_name
   instance_security_group_ids          = [module.ec2_sg.security_group_id]
   instance_associate_public_ip_address = var.instance_associate_public_ip_address
-  iam_instance_profile                 = module.iam.s3_reader_writer_iam_instance_profile_name
+  iam_instance_profile                 = module.iam.s3_iam_instance_profile_name
 
   alb_target_group_arn = module.alb.target_group_arn
   instance_port        = var.target_group_port
