@@ -93,3 +93,22 @@ resource "aws_cloudfront_distribution" "this" {
 
 }
 
+# Route 53
+data "aws_route53_zone" "this" {
+  name         = var.domain_name
+  private_zone = false
+}
+
+resource "aws_route53_record" "alias_record" {
+  zone_id = data.aws_route53_zone.this.zone_id
+  name    = var.domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.this.domain_name
+    zone_id                = "Z2FDTNDATAQYW2" # CloudFront 고정 Zone ID
+    evaluate_target_health = false
+  }
+
+  ttl = 300
+}
