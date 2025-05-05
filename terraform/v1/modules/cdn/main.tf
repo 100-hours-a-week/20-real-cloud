@@ -109,6 +109,4 @@ resource "aws_route53_record" "alias_record" {
     zone_id                = "Z2FDTNDATAQYW2" # CloudFront 고정 Zone ID
     evaluate_target_health = false
   }
-
-  ttl = 300
 }
