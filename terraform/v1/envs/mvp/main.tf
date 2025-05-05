@@ -1,10 +1,10 @@
 module "network" {
   source = "../../modules/network"
 
-  vpc_cidr_block           = var.vpc_cidr_block
-  public_subnet_cidr_block = var.public_subnet_cidr_block
-  availability_zone        = var.availability_zone
-  gcp_cidr_block           = var.gcp_cidr_block
+  vpc_cidr_block            = var.vpc_cidr_block
+  public_subnet_cidr_blocks = var.public_subnet_cidr_blocks
+  availability_zones        = var.availability_zones
+  gcp_cidr_block            = var.gcp_cidr_block
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -57,7 +57,7 @@ module "cdn" {
   bucket_regional_domain_name = module.storage.static_bucket_regional_domain_name
 
   domain_name         = var.domain_name
-  acm_certificate_arn = var.acm_certificate_arn
+  acm_certificate_arn = var.us_acm_certificate_arn
   alb_dns_name        = module.alb.alb_dns_name
 
   common_tags = local.common_tags
@@ -70,7 +70,7 @@ module "compute" {
 
   ami_id                               = var.ami_id
   instance_type                        = var.instance_type
-  subnet_id                            = module.network.public_subnet_id
+  subnet_id                            = module.network.public_subnet_ids[0]
   vpc_id                               = module.network.vpc_id
   key_name                             = var.key_name
   instance_security_group_ids          = [module.ec2_sg.security_group_id]
@@ -86,10 +86,10 @@ module "compute" {
 
 module "alb" {
   source            = "../../modules/alb"
-  subnet_ids        = [module.network.public_subnet_id]
+  subnet_ids        = module.network.public_subnet_ids
   security_group_id = module.alb_sg.security_group_id
 
-  certificate_arn     = var.acm_certificate_arn
+  certificate_arn     = var.ap_acm_certificate_arn
   target_group_vpc_id = module.network.vpc_id
   target_group_port   = var.target_group_port
 

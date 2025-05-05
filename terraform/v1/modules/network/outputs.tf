@@ -3,9 +3,9 @@ output "vpc_id" {
   value       = aws_vpc.this.id
 }
 
-output "public_subnet_id" {
+output "public_subnet_ids" {
   description = "Public subnet ID in VPC"
-  value       = aws_subnet.this.id
+  value       = [for subnet in aws_subnet.public : subnet.id]
 }
 
 output "internet_gateway_id" {

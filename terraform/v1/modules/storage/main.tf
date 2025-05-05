@@ -2,6 +2,10 @@
 resource "aws_s3_bucket" "static" {
   bucket = "${var.name_prefix}-${var.common_tags.Environment}-static"
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   tags = merge(
     local.default_tags,
     {
@@ -23,7 +27,7 @@ resource "aws_s3_bucket_policy" "s3_static_policy" {
         Principal = {
           Service = "cloudfront.amazonaws.com"
         },
-        Action = ["s3:GetObject"],
+        Action   = ["s3:GetObject"],
         Resource = ["${aws_s3_bucket.static.arn}/*"],
         Condition = {
           StringEquals = {
@@ -32,26 +36,26 @@ resource "aws_s3_bucket_policy" "s3_static_policy" {
         }
       },
       {
-        Sid       = "AllowListBucketToIAMRole",
-        Effect    = "Allow",
+        Sid    = "AllowListBucketToIAMRole",
+        Effect = "Allow",
         Principal = {
           AWS = var.s3_iam_role_arn
         },
-        Action    = ["s3:ListBucket"],
-        Resource  = ["${aws_s3_bucket.static.arn}"]
+        Action   = ["s3:ListBucket"],
+        Resource = ["${aws_s3_bucket.static.arn}"]
       },
       {
-        Sid       = "AllowFullObjectAccessToIAMRole",
-        Effect    = "Allow",
+        Sid    = "AllowFullObjectAccessToIAMRole",
+        Effect = "Allow",
         Principal = {
           AWS = var.s3_iam_role_arn
         },
-        Action    = [
+        Action = [
           "s3:GetObject",
           "s3:PutObject",
           "s3:DeleteObject"
         ],
-        Resource  = ["${aws_s3_bucket.static.arn}/*"]
+        Resource = ["${aws_s3_bucket.static.arn}/*"]
       }
     ]
   })
@@ -70,11 +74,6 @@ resource "aws_s3_bucket" "log" {
       Name = "${var.name_prefix}-${var.common_tags.Environment}-log"
     }
   )
-}
-
-resource "aws_s3_bucket_acl" "log_acl" {
-  bucket = aws_s3_bucket.log.id
-  acl    = "private"
 }
 
 resource "aws_s3_bucket_versioning" "log_versioning" {
