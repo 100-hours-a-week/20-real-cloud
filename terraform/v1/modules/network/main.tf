@@ -1,8 +1,8 @@
 # VPC
 resource "aws_vpc" "this" {
-  cidr_block = var.vpc_cidr_block
-  enable_dns_support   = true   # VPC에서 DNS 지원 활성화
-  enable_dns_hostnames = true   # 퍼블릭 DNS 호스트명 자동 생성 활성화
+  cidr_block           = var.vpc_cidr_block
+  enable_dns_support   = true # VPC에서 DNS 지원 활성화
+  enable_dns_hostnames = true # 퍼블릭 DNS 호스트명 자동 생성 활성화
 
   tags = merge(
     local.default_tags,
