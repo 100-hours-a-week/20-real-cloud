@@ -8,8 +8,8 @@ variable "acm_certificate_arn" {
   type        = string
 }
 
-variable "domain_name" {
-  description = "The custom domain name (CNAME) to associate with the CloudFront distribution"
+variable "apex_domain_name" {
+  description = "The Apex domain name to associate with the CloudFront distribution"
   type        = string
 }
 

@@ -56,7 +56,7 @@ module "cdn" {
   source                      = "../../modules/cdn"
   bucket_regional_domain_name = module.storage.static_bucket_regional_domain_name
 
-  domain_name         = var.domain_name
+  apex_domain_name    = var.apex_domain_name
   acm_certificate_arn = var.us_acm_certificate_arn
   alb_dns_name        = module.alb.alb_dns_name
 

@@ -8,10 +8,13 @@ resource "aws_cloudfront_origin_access_control" "static_oac" {
 resource "aws_cloudfront_distribution" "this" {
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "CloudFront for ${var.domain_name}"
+  comment             = "CloudFront for ${var.apex_domain_name}"
   default_root_object = "index.html"
 
-  aliases = [var.domain_name]
+  aliases = [
+    var.apex_domain_name,
+    "www.${var.apex_domain_name}"
+  ]
 
   origin {
     origin_id                = "s3_origin"
@@ -95,18 +98,30 @@ resource "aws_cloudfront_distribution" "this" {
 
 # Route 53
 data "aws_route53_zone" "this" {
-  name         = var.domain_name
+  name         = var.apex_domain_name
   private_zone = false
 }
 
-resource "aws_route53_record" "alias_record" {
+resource "aws_route53_record" "apex_alias" {
   zone_id = data.aws_route53_zone.this.zone_id
-  name    = var.domain_name
+  name    = var.apex_domain_name
   type    = "A"
 
   alias {
     name                   = aws_cloudfront_distribution.this.domain_name
     zone_id                = "Z2FDTNDATAQYW2" # CloudFront 고정 Zone ID
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "www_alias" {
+  zone_id = data.aws_route53_zone.this.zone_id
+  name    = "www.${var.apex_domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.this.domain_name
+    zone_id                = "Z2FDTNDATAQYW2"
     evaluate_target_health = false
   }
 }
