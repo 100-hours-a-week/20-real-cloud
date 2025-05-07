@@ -22,20 +22,21 @@ resource "aws_cloudfront_distribution" "this" {
     origin_access_control_id = aws_cloudfront_origin_access_control.static_oac.id
   }
 
+  # EC2 Origin (application server)
   origin {
-    domain_name = var.alb_dns_name
-    origin_id   = "alb_origin"
+    origin_id   = "ec2_origin"
+    domain_name = var.instance_public_dns
 
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "https-only"
+      origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
   default_cache_behavior {
-    target_origin_id       = "alb_origin"
+    target_origin_id       = "ec2_origin"
     viewer_protocol_policy = "redirect-to-https"
 
     allowed_methods = ["HEAD", "DELETE", "POST", "GET", "OPTIONS", "PUT", "PATCH"]
@@ -44,7 +45,9 @@ resource "aws_cloudfront_distribution" "this" {
     forwarded_values {
       query_string = true
       headers      = ["*"]
-      cookies { forward = "all" }
+      cookies {
+        forward = "all"
+      }
     }
 
     min_ttl     = 0

@@ -148,7 +148,7 @@ variable "instance_associate_public_ip_address" {
 }
 
 # alb
-variable "target_group_port" {
-  description = "port number of target group"
-  type        = number
-}
+# variable "target_group_port" {
+#   description = "port number of target group"
+#   type        = number
+# }
