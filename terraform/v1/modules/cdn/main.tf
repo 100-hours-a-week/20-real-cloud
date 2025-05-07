@@ -52,7 +52,7 @@ resource "aws_cloudfront_distribution" "this" {
     max_ttl     = 0
   }
   ordered_cache_behavior {
-    path_pattern           = "/images/*"
+    path_pattern           = "/_static/*"
     target_origin_id       = "s3_origin"
     viewer_protocol_policy = "redirect-to-https"
 
