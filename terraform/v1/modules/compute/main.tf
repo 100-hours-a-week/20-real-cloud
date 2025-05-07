@@ -8,6 +8,10 @@ resource "aws_instance" "ec2" {
   iam_instance_profile        = var.iam_instance_profile
 
 
+  lifecycle {
+    prevent_destroy = true
+  }
+  
   tags = merge(
     local.default_tags,
     {
