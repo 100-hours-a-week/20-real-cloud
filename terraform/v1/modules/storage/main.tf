@@ -68,6 +68,10 @@ resource "aws_s3_bucket_policy" "s3_static_policy" {
 resource "aws_s3_bucket" "log" {
   bucket = "${var.name_prefix}-${var.common_tags.Environment}-log"
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   tags = merge(
     local.default_tags,
     {
