@@ -38,16 +38,16 @@ variable "iam_instance_profile" {
   type        = string
 }
 
-variable "alb_target_group_arn" {
-  description = "ALB Target Group ARN"
-  type        = string
-}
+# variable "alb_target_group_arn" {
+#   description = "ALB Target Group ARN"
+#   type        = string
+# }
 
-variable "instance_port" {
-  description = "Port number of the instance to be used in the target group"
-  type        = number
-  default     = 80
-}
+# variable "instance_port" {
+#   description = "Port number of the instance to be used in the target group"
+#   type        = number
+#   default     = 80
+# }
 
 # Tags
 variable "module_name" {
@@ -65,3 +65,4 @@ variable "name_prefix" {
   description = "Name tag's prefix"
   type        = string
 }
+

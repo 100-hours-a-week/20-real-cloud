@@ -13,8 +13,14 @@ variable "apex_domain_name" {
   type        = string
 }
 
-variable "alb_dns_name" {
-  description = "The DNS name of the ALB to use as the origin for CloudFront"
+# variable "alb_dns_name" {
+#   description = "The DNS name of the ALB"
+#   type        = string
+# }
+
+
+variable "instance_public_dns" {
+  description = "The public DNS name of the EC2 instance"
   type        = string
 }
 
