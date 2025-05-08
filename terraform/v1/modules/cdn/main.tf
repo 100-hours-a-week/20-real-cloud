@@ -9,7 +9,6 @@ resource "aws_cloudfront_distribution" "this" {
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "CloudFront for ${var.apex_domain_name}"
-  default_root_object = "index.html"
 
   aliases = [
     var.apex_domain_name,
