@@ -66,3 +66,8 @@ variable "name_prefix" {
   type        = string
 }
 
+variable "eip_allocation_id" {
+  description = "The allocation ID of the EIP to associate with the EC2 instance"
+  type        = string
+}
+

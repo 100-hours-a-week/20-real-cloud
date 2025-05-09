@@ -20,6 +20,22 @@ resource "aws_instance" "ec2" {
   )
 }
 
+resource "aws_eip" "ec2_eip" {  
+
+  tags = merge(
+    local.default_tags,
+    {
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-eip"
+    }
+  )
+}
+
+# EIP 연결
+resource "aws_eip_association" "ec2_eip" {
+  instance_id   = aws_instance.ec2.id
+  allocation_id = aws_eip.ec2_eip.id
+}
+
 # resource "aws_lb_target_group_attachment" "ec2" {
 #   target_group_arn = var.alb_target_group_arn
 #   target_id        = aws_instance.ec2.id

@@ -77,6 +77,7 @@ module "compute" {
   instance_security_group_ids          = [module.ec2_sg.security_group_id]
   instance_associate_public_ip_address = var.instance_associate_public_ip_address
   iam_instance_profile                 = module.iam.s3_iam_instance_profile_name
+  eip_allocation_id                    = var.eip_allocation_id
 
   #alb_target_group_arn = module.alb.target_group_arn
   #instance_port = var.target_group_port

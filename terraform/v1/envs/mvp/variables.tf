@@ -27,6 +27,11 @@ variable "vpc_id" {
   default     = ""
 }
 
+variable "eip_allocation_id" {
+  description = "The allocation ID of the EIP to associate with the EC2 instance"
+  type        = string
+}
+
 variable "ec2_ingress_rules" {
   description = "Security Group's Ingress rules"
   type = list(object({
