@@ -4,6 +4,7 @@ about: Feature Template
 title: ''
 labels: ''
 assignees: ''
+
 ---
 
 # 🤖 기능 개요
