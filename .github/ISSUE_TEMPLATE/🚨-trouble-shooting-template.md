@@ -1,6 +1,6 @@
 ---
 name: "\U0001F6A8 Trouble shooting Template"
-about: Troubleshooting
+about: "\U0001F6A8 Trouble shooting Template"
 title: "[Troubleshooting] 2025-00-00 - 오류 내용"
 labels: "\U0001F6A8 TroubleShooting"
 assignees: ''
