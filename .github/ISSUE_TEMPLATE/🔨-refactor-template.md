@@ -4,6 +4,7 @@ about: Refactor Template
 title: ''
 labels: ''
 assignees: ''
+
 ---
 
 # 🔨 리팩토링이 필요한 부분

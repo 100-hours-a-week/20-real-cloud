@@ -4,6 +4,7 @@ about: Bug Template
 title: ''
 labels: ''
 assignees: ''
+
 ---
 
 # 🐞 버그/에러 개요

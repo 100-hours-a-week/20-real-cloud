@@ -1,0 +1,3 @@
+[submodule "terraform-properties"]
+	path = terraform-properties
+	url = https://github.com/shinnyriver/terraform-properties.git
