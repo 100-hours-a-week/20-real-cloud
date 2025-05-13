@@ -6,14 +6,21 @@ resource "aws_cloudfront_origin_access_control" "static_oac" {
   signing_protocol                  = "sigv4"
 }
 resource "aws_cloudfront_distribution" "this" {
-  enabled             = true
-  is_ipv6_enabled     = true
-  comment             = "CloudFront for ${var.apex_domain_name}"
+  enabled         = true
+  is_ipv6_enabled = true
+  comment         = "CloudFront for ${var.apex_domain_name}"
 
   aliases = [
     var.apex_domain_name,
     "www.${var.apex_domain_name}"
   ]
+
+  custom_error_response {
+    error_code            = 502
+    response_code         = 200
+    response_page_path    = "/error502.html"
+    error_caching_min_ttl = 300
+  }
 
   origin {
     origin_id                = "s3_origin"
