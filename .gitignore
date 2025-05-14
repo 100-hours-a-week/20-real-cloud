@@ -39,3 +39,6 @@ terraform.rc
 ### Terraform ###
 # Local .terraform directories
 **/.terraform/*
+
+terraform/v2/backend/*
+terraform/v1/backend/*
