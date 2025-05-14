@@ -22,7 +22,7 @@ resource "aws_lb_target_group" "back_blue" {
   vpc_id   = var.target_group_vpc_id
 
   health_check {
-    path                = "/healthz"
+    path                = "/api/healthz"
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 30
@@ -45,7 +45,7 @@ resource "aws_lb_target_group" "back_green" {
   vpc_id   = var.target_group_vpc_id
 
   health_check {
-    path                = "/healthz"
+    path                = "/api/healthz"
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 30
