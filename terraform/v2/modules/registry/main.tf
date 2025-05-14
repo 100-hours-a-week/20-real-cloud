@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "this" {
-  name = "${var.name_prefix}-${var.common_tags.Environment}-ecr"
+  name = "${var.name_prefix}-${var.common_tags.Environment}-${var.module_name}"
 
   image_scanning_configuration {
     scan_on_push = true
@@ -10,7 +10,7 @@ resource "aws_ecr_repository" "this" {
   tags = merge(
     var.common_tags,
     {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-ecr"
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-${var.module_name}"
     }
   )
 } 
