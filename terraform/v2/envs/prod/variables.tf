@@ -36,31 +36,14 @@ variable "create_nat_gateway" {
 }
 
 #compute
-variable "ec2_instances" {
-  type = map(object({
-    ami                         = string
-    instance_type               = string
-    subnet_id                   = string
-    key_name                    = string
-    security_group_ids          = list(string)
-    associate_public_ip_address = bool
-    iam_instance_profile        = string
-    use_eip                     = bool
-    user_data                   = string
-  }))
+variable "ami_id" {
+  description = "The AMI ID for the instance."
+  type        = string
 }
 
-variable "lanch_templates" {
-  type = map(object({
-    ami                  = string
-    instance_type        = string
-    key_name             = string
-    user_data            = string
-    security_group_ids   = list(string)
-    iam_instance_profile = string
-    alb_target_group_arn = string
-    subnet_id          = string
-  }))
+variable "key_name" {
+  description = "The key pair name to use for SSH access."
+  type        = string
 }
 
 
@@ -111,6 +94,16 @@ variable "alb_egress_rules" {
     cidr_blocks = list(string)
   }))
   default = []
+}
+
+#cdn
+variable "us_acm_certificate_arn" {
+  description = "The ARN of the ACM certificate to use for HTTPS"
+  type        = string
+}
+variable "ap_acm_certificate_arn" {
+  description = "The ARN of the ACM certificate to use for HTTPS"
+  type        = string
 }
 
 # Tags

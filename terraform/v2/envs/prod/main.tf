@@ -34,20 +34,6 @@ module "network" {
   name_prefix = local.name_prefix
 }
 
-# module "alb" {
-#   source            = "../../modules/alb"
-#   subnet_ids        = module.network.public_subnet_ids
-#   security_group_id = module.alb_sg.security_group_id
-
-#   certificate_arn     = var.ap_acm_certificate_arn
-#   target_group_vpc_id = module.network.vpc_id
-#   target_group_port   = var.target_group_port
-
-#   common_tags = local.common_tags
-#   name_prefix = var.name_prefix
-# }
-
-
 module "ec2_sg" {
   source = "../../modules/security_group"
 
@@ -71,6 +57,21 @@ module "alb_sg" {
   name_prefix = local.name_prefix
 }
 
+module "alb" {
+  source = "../../modules/alb"
+
+  subnet_ids          = module.network.private_subnet_ids
+  security_group_id   = module.alb_sg.security_group_id
+  certificate_arn     = var.ap_acm_certificate_arn
+  target_group_vpc_id = module.network.vpc_id
+
+  back_target_group_port  = 8080
+  front_target_group_port = 80
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
 module "iam" {
   source = "../../modules/iam"
 
@@ -78,12 +79,71 @@ module "iam" {
   name_prefix = local.name_prefix
 }
 
-
 module "compute" {
   source = "../../modules/compute"
+  ec2_instances = {
+    "bastion" = {
+      ami                         = var.ami_id
+      instance_type               = "t3.micro"
+      subnet_id                   = module.network.public_subnet_ids[0]
+      key_name                    = var.key_name
+      security_group_ids          = module.ec2_sg.security_group_id
+      associate_public_ip_address = true
+      iam_instance_profile        = null
+      use_eip                     = true
+      user_data                   = file("../../modules/compute/scripts/bastion_userdata.sh")
+    }
+    "monitoring" = {
+      ami                         = var.ami_id
+      instance_type               = "t3.micro"
+      subnet_id                   = module.network.public_subnet_ids[0]
+      key_name                    = var.key_name
+      security_group_ids          = module.ec2_sg.security_group_id
+      associate_public_ip_address = true
+      iam_instance_profile        = null
+      use_eip                     = true
+      user_data                   = file("../../modules/compute/scripts/monitoring_userdata.sh")
+    }
 
-  ec2_instances = var.ec2_instances
-  lanch_templates = var.lanch_templates
+    "database" = {
+      ami                         = var.ami_id
+      instance_type               = "t3.medium"
+      subnet_id                   = module.network.private_subnet_ids[0]
+      key_name                    = var.key_name
+      security_group_ids          = module.ec2_sg.security_group_id
+      associate_public_ip_address = false
+      iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
+      use_eip                     = false
+      user_data                   = file("../../modules/compute/scripts/db_userdata.sh")
+    }
+
+  }
+
+  # ASG + Launch Template 정의
+  lanch_templates = {
+    "front-blue" = {
+      ami                  = var.ami_id
+      instance_type        = "t3.small"
+      key_name             = var.key_name
+      user_data            = file("../../modules/compute/scripts/init_userdata.sh")
+      security_group_ids   = module.ec2_sg.security_group_id
+      iam_instance_profile = module.iam.s3_iam_instance_profile_name
+      alb_target_group_arn = module.alb.tg_front_blue_arn
+      subnet_id            = module.network.private_subnet_ids[0]
+    }
+
+    "back-blue" = {
+      ami                  = var.ami_id
+      instance_type        = "t3.medium"
+      key_name             = var.key_name
+      user_data            = file("../../modules/compute/scripts/init_userdata.sh")
+      security_group_ids   = module.ec2_sg.security_group_id
+      iam_instance_profile = module.iam.s3_iam_instance_profile_name
+      alb_target_group_arn = module.alb.tg_back_blue_arn
+      subnet_id            = module.network.private_subnet_ids[0]
+    }
+  }
+
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix

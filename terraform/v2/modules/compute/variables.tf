@@ -21,7 +21,7 @@ variable "lanch_templates" {
     security_group_ids   = list(string)
     iam_instance_profile = string
     alb_target_group_arn = string
-    subnet_id          = string
+    subnet_id            = string
   }))
 }
 
