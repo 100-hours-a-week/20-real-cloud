@@ -1,4 +1,9 @@
 # Network
+variable "is_infra_env" {
+  description = "Is this environment an infra environment?"
+  type        = bool
+}
+
 variable "vpc_cidr_block" {
   description = "VPC CIDR block to which AWS Resources belong"
   type        = string
@@ -22,6 +27,17 @@ variable "availability_zones" {
 variable "private_subnet_names" {
   description = "Private Subnet Names (App or DB)"
   type        = list(string)
+}
+
+variable "create_nat_gateway" {
+  description = "Create NAT Gateway when this variable is true (In Dev Environment)"
+  type        = bool
+}
+
+variable "nat_gateway_id" {
+  description = "NAT Gateway ID to associate with route table"
+  type        = string
+  default     = null
 }
 
 # Tags

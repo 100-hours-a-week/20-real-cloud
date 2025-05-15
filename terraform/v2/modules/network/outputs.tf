@@ -15,10 +15,10 @@ output "private_subnet_ids" {
 
 output "nat_gateway_id" {
   description = "NAT Gateway ID"
-  value       = (var.is_infra_env == false && var.create_nat_gateway == true) ? aws_nat_gateway.this[0].id : null
+  value       = var.create_nat_gateway ? aws_nat_gateway.this[0].id : var.nat_gateway_id
 }
 
 output "internet_gateway_id" {
   description = "Internet Gateway ID belonging to VPC"
-  value       = var.is_infra_env ? aws_internet_gateway.this[0].id : null
+  value       = var.is_infra_env ? aws_internet_gateway.this[0].id : var.internet_gateway_id
 }

@@ -2,7 +2,6 @@
 variable "is_infra_env" {
   description = "In Infra environments this variable is true, in other environments this variable is false"
   type        = bool
-  default     = false
 }
 
 variable "vpc_id" {
@@ -39,6 +38,17 @@ variable "private_subnet_names" {
   description = "Private Subnet names"
   type        = list(string)
   default     = null
+}
+
+variable "nat_gateway_id" {
+  description = "NAT Gateway ID to associate with route table"
+  type        = string
+  default     = null
+}
+
+variable "create_nat_gateway" {
+  description = "Create NAT Gateway when this variable is true (In Dev Environment)"
+  type        = bool
 }
 
 # Tags

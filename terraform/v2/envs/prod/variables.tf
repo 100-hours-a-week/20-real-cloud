@@ -1,4 +1,9 @@
 # Network
+variable "is_infra_env" {
+  description = "Is this environment an infra environment?"
+  type        = bool
+}
+
 variable "vpc_cidr_block" {
   description = "VPC CIDR block to which AWS Resources belong"
   type        = string
@@ -19,15 +24,16 @@ variable "availability_zones" {
   type        = list(string)
 }
 
+variable "private_subnet_names" {
+  description = "Private Subnet Names (App or DB)"
+  type        = list(string)
+}
+
 variable "create_nat_gateway" {
   description = "Create NAT Gateway when this variable is true (In Prod Environment)"
   type        = bool
 }
 
-variable "private_subnet_names" {
-  description = "Private Subnet Names (App or DB)"
-  type        = list(string)
-}
 
 # Tags
 variable "name_prefix" {

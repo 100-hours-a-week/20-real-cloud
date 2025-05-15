@@ -1,7 +1,6 @@
 variable "is_infra_env" {
   description = "In Infra environments this variable is true, in other environments this variable is false"
   type        = bool
-  default     = false
 }
 
 variable "vpc_id" {
@@ -35,9 +34,13 @@ variable "availability_zones" {
 }
 
 variable "create_nat_gateway" {
-  description = "Create NAT Gateway when this variable is true (In Prod Environment)"
+  description = "Create NAT Gateway when this variable is true (In Dev Environment)"
   type        = bool
-  default     = false
+}
+
+variable "nat_gateway_id" {
+  description = "NAT Gateway ID to associate with route table"
+  type        = string
 }
 
 # Tags
