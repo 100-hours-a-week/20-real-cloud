@@ -1,3 +1,4 @@
+
 # Network
 variable "is_infra_env" {
   description = "Is this environment an infra environment?"
@@ -34,6 +35,76 @@ variable "create_nat_gateway" {
   type        = bool
 }
 
+#compute
+variable "ami_id" {
+  description = "The AMI ID for the instance."
+  type        = string
+}
+
+variable "key_name" {
+  description = "The key pair name to use for SSH access."
+  type        = string
+}
+
+
+#security groups
+variable "ec2_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "ec2_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "alb_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "alb_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+#cdn
+variable "us_acm_certificate_arn" {
+  description = "The ARN of the ACM certificate to use for HTTPS"
+  type        = string
+}
+variable "ap_acm_certificate_arn" {
+  description = "The ARN of the ACM certificate to use for HTTPS"
+  type        = string
+}
 
 # Tags
 variable "name_prefix" {

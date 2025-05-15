@@ -6,4 +6,4 @@ terraform {
     dynamodb_table = "ktb-20-dynamo-lock-v2"
     encrypt        = true
   }
-} 
+}
