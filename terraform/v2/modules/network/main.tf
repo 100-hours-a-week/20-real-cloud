@@ -79,7 +79,7 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route" "public_internet_route" {
-  count                  = (!var.is_infra_env && local.selected_internet_gateway_id != null) ? 1 : 0
+  count                  = var.is_infra_env ? 0 : 1
   route_table_id         = aws_route_table.public[0].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = local.selected_internet_gateway_id
