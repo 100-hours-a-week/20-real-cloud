@@ -34,6 +34,19 @@ module "network" {
   name_prefix = local.name_prefix
 }
 
+# module "alb" {
+#   source            = "../../modules/alb"
+#   subnet_ids        = module.network.public_subnet_ids
+#   security_group_id = module.alb_sg.security_group_id
+
+#   certificate_arn     = var.ap_acm_certificate_arn
+#   target_group_vpc_id = module.network.vpc_id
+#   target_group_port   = var.target_group_port
+
+#   common_tags = local.common_tags
+#   name_prefix = var.name_prefix
+# }
+
 
 module "ec2_sg" {
   source = "../../modules/security_group"
@@ -42,6 +55,17 @@ module "ec2_sg" {
 
   ingress_rules = var.ec2_ingress_rules
   egress_rules  = var.ec2_egress_rules
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+module "alb_sg" {
+  source = "../../modules/security_group"
+
+  vpc_id = module.network.vpc_id
+
+  ingress_rules = var.alb_ingress_rules
+  egress_rules  = var.alb_egress_rules
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix

@@ -89,6 +89,29 @@ variable "ec2_egress_rules" {
   default = []
 }
 
+variable "alb_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "alb_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
 
 # Tags
 variable "name_prefix" {
