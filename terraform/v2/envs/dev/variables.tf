@@ -40,6 +40,42 @@ variable "nat_gateway_id" {
   default     = null
 }
 
+# Monitoring
+variable "front_service_name" {
+  description = "Frontend Service Name"
+  type        = string
+}
+
+variable "back_service_name" {
+  description = "Backend Service Name"
+  type        = string
+}
+
+variable "db_service_name" {
+  description = "Database Service Name"
+  type        = string
+}
+
+variable "retention_in_days" {
+  description = "Number of days to retain the logs in CloudWatch"
+  type        = number
+}
+
+variable "front_log_group_names" {
+  description = "Frontend Log group names"
+  type        = list(string)
+}
+
+variable "back_log_group_names" {
+  description = "Backend Log group names"
+  type        = list(string)
+}
+
+variable "db_log_group_names" {
+  description = "Database Log group names"
+  type        = list(string)
+}
+
 # Tags
 variable "name_prefix" {
   description = "Name tag's prefix"
