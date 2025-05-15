@@ -1,3 +1,4 @@
+
 # Network
 variable "is_infra_env" {
   description = "Is this environment an infra environment?"
@@ -32,6 +33,60 @@ variable "private_subnet_names" {
 variable "create_nat_gateway" {
   description = "Create NAT Gateway when this variable is true (In Prod Environment)"
   type        = bool
+}
+
+#compute
+variable "ec2_instances" {
+  type = map(object({
+    ami                         = string
+    instance_type               = string
+    subnet_id                   = string
+    key_name                    = string
+    security_group_ids          = list(string)
+    associate_public_ip_address = bool
+    iam_instance_profile        = string
+    use_eip                     = bool
+    user_data                   = string
+  }))
+}
+
+variable "lanch_templates" {
+  type = map(object({
+    ami                  = string
+    instance_type        = string
+    key_name             = string
+    user_data            = string
+    security_group_ids   = list(string)
+    iam_instance_profile = string
+    alb_target_group_arn = string
+    subnet_id          = string
+  }))
+}
+
+
+#security groups
+variable "ec2_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "ec2_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
 }
 
 

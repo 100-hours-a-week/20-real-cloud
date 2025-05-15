@@ -33,3 +33,34 @@ module "network" {
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
+
+
+module "ec2_sg" {
+  source = "../../modules/security_group"
+
+  vpc_id = module.network.vpc_id
+
+  ingress_rules = var.ec2_ingress_rules
+  egress_rules  = var.ec2_egress_rules
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+module "iam" {
+  source = "../../modules/iam"
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+
+module "compute" {
+  source = "../../modules/compute"
+
+  ec2_instances = var.ec2_instances
+  lanch_templates = var.lanch_templates
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
