@@ -21,13 +21,8 @@ variable "lanch_templates" {
     security_group_ids   = list(string)
     iam_instance_profile = string
     alb_target_group_arn = string
+    subnet_id            = string
   }))
-}
-
-
-variable "private_subnet_ids" {
-  description = "The subnet ID to launch the instance in."
-  type        = string
 }
 
 
@@ -57,11 +52,6 @@ variable "common_tags" {
 
 variable "name_prefix" {
   description = "Name tag's prefix"
-  type        = string
-}
-
-variable "eip_allocation_id" {
-  description = "The allocation ID of the EIP to associate with the EC2 instance"
   type        = string
 }
 
