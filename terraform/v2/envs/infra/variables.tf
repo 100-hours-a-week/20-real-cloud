@@ -50,6 +50,23 @@ variable "create_nat_gateway" {
   description = "Create NAT Gateway when this variable is true (In Dev Environment)"
   type        = bool
 }
+
+# Monitoring
+variable "bastion_service_name" {
+  description = "Bastion Service Name"
+  type        = string
+}
+
+variable "retention_in_days" {
+  description = "Number of days to retain the logs in CloudWatch"
+  type        = number
+}
+
+variable "bastion_log_group_names" {
+  description = "Bastion Log group names"
+  type        = list(string)
+}
+
 # variable "vpc_cidr_block" {
 #   description = "VPC CIDR block to which EC2 instance belongs"
 #   type        = string

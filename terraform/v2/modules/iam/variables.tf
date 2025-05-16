@@ -1,16 +1,15 @@
-# Tags
 variable "module_name" {
-  description = "Module name used for Module tag"
+  description = "Module name"
   type        = string
-  default     = "security"
-}
-
-variable "common_tags" {
-  description = "Common tags"
-  type        = map(string)
+  default     = "iam"
 }
 
 variable "name_prefix" {
-  description = "Name tag's prefix"
+  description = "Name prefix for the ECR repository"
   type        = string
+}
+
+variable "common_tags" {
+  description = "Common tags for all resources"
+  type        = map(string)
 }
