@@ -1,0 +1,79 @@
+name: Auto Version Tagging
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  tag-on-merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. 버전 태그 생성
+      - name: Generate Version Tag
+        env:
+          TAG_PREFIX: "v"
+        run: |
+          BRANCH_NAME=$(echo "${GITHUB_REF}" | awk -F/ '{print $3}')
+          echo "Branch Name: ${BRANCH_NAME}"
+          
+          # 최신 태그 가져오기
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "${TAG_PREFIX}0.0.0")
+          echo "Latest Tag: ${LATEST_TAG}"
+          
+          # 버전 파싱
+          VERSION=${LATEST_TAG#$TAG_PREFIX}
+          IFS='.' read -ra PARTS <<< "$VERSION"
+          MAJOR=${PARTS[0]}
+          MINOR=${PARTS[1]}
+          PATCH=${PARTS[2]}
+          
+          # 최신 main 태그 확인
+          MAIN_LATEST_TAG=$(git tag --list "v*" | sort -V | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | tail -n 1 || echo "v0.0.0")
+          MAIN_VERSION=${MAIN_LATEST_TAG#$TAG_PREFIX}
+          MAIN_MAJOR=$(echo "$MAIN_VERSION" | cut -d. -f1)
+          
+          # 버전 증가 로직
+          if [[ "${BRANCH_NAME}" == "main" ]]; then
+            # 메인 브랜치: Major 버전 증가
+            MAJOR=$((MAJOR+1))
+            MINOR=0
+            PATCH=0
+          elif [[ "${BRANCH_NAME}" == "dev" ]]; then
+            # 메이저 동기화
+            if [[ "${MAJOR}" -lt "${MAIN_MAJOR}" ]]; then
+              MAJOR="${MAIN_MAJOR}"
+              MINOR=0
+              PATCH=0
+            else
+              MINOR=$((MINOR+1))
+              PATCH=0
+            fi
+          elif [[ "${BRANCH_NAME}" == "hotfix" ]]; then
+            # 핫픽스 브랜치: Patch 버전 증가
+            PATCH=$((PATCH+1))
+          else
+            echo "Unsupported branch, skipping tag."
+            exit 0
+          fi
+
+          # 최종 버전
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          NEW_TAG="${TAG_PREFIX}${NEW_VERSION}"
+          echo "New Tag: ${NEW_TAG}"
+          
+          # 태그 생성 및 푸시
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag "${NEW_TAG}"
+          git push origin "${NEW_TAG}"
