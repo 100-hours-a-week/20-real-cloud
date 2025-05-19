@@ -34,18 +34,9 @@ jobs:
       # 4. 태그 전용 브랜치 체크아웃
       - name: Checkout Tags Branch
         run: |
-          git fetch origin
-          if git ls-remote --heads origin tags | grep -q "refs/heads/tags"; then
-            echo "Tags branch exists. Checking out..."
-            git checkout tags
-            git pull origin tags
-          else
-            echo "Creating tags branch..."
-            git checkout --orphan tags
-            git commit --allow-empty -m "Initialize tags branch"
-            git push origin tags
-            git checkout tags
-          fi
+          git fetch origin +refs/tags/*:refs/tags/* +refs/heads/tags:refs/heads/tags
+          git checkout tags || git checkout -b tags origin/tags
+          git pull origin tags
 
       # 5. 버전 태그 생성
       - name: Generate Version Tag
@@ -54,7 +45,7 @@ jobs:
           TAG_PREFIX: "v"
         run: |
           # 최신 태그 가져오기 (tags 브랜치에서만)
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "${TAG_PREFIX}0.0.0")
+          LATEST_TAG=$(git tag --list "v*" | sort -V | tail -n 1 || echo "${TAG_PREFIX}0.0.0")
           echo "Latest Tag (tags branch): ${LATEST_TAG}"
           
           # 메인 브랜치의 최신 태그 확인
