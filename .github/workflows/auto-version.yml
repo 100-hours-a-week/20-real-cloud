@@ -1,17 +1,19 @@
-name: Auto Version Tagging
+name: Auto Version Tagging and Release
 
 on:
   push:
     branches:
       - main
       - dev
+      - hotfix
   pull_request:
     branches:
       - main
       - dev
+      - hotfix
 
 jobs:
-  tag-on-merge:
+  tag-and-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -23,44 +25,61 @@ jobs:
 
       # 2. 버전 태그 생성
       - name: Generate Version Tag
+        id: tag
         env:
           TAG_PREFIX: "v"
         run: |
           BRANCH_NAME=$(echo "${GITHUB_REF}" | awk -F/ '{print $3}')
           echo "Branch Name: ${BRANCH_NAME}"
           
-          # 최신 태그 가져오기
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "${TAG_PREFIX}0.0.0")
-          echo "Latest Tag: ${LATEST_TAG}"
+          # 최신 태그 가져오기 (tags 브랜치 포함)
+          git fetch origin refs/heads/tags:refs/remotes/origin/tags
+          LATEST_TAG=$(git describe --tags --abbrev=0 origin/tags 2>/dev/null || echo "${TAG_PREFIX}0.0.0")
+          echo "Latest Tag (tags branch): ${LATEST_TAG}"
+          
+          # 메인 브랜치의 최신 태그 확인
+          MAIN_LATEST_TAG=$(git tag --list "v*" | sort -V | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | tail -n 1 || echo "v0.0.0")
+          echo "Latest Main Tag: ${MAIN_LATEST_TAG}"
+          
+          # 최신 태그가 메인 태그보다 낮을 때 동기화
+          LATEST_VERSION=${LATEST_TAG#$TAG_PREFIX}
+          MAIN_VERSION=${MAIN_LATEST_TAG#$TAG_PREFIX}
+          IFS='.' read -ra MAIN_PARTS <<< "$MAIN_VERSION"
+          MAIN_MAJOR=${MAIN_PARTS[0]}
+          MAIN_MINOR=${MAIN_PARTS[1]}
+          MAIN_PATCH=${MAIN_PARTS[2]}
           
           # 버전 파싱
-          VERSION=${LATEST_TAG#$TAG_PREFIX}
-          IFS='.' read -ra PARTS <<< "$VERSION"
+          IFS='.' read -ra PARTS <<< "$LATEST_VERSION"
           MAJOR=${PARTS[0]}
           MINOR=${PARTS[1]}
           PATCH=${PARTS[2]}
           
-          # 최신 main 태그 확인
-          MAIN_LATEST_TAG=$(git tag --list "v*" | sort -V | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | tail -n 1 || echo "v0.0.0")
-          MAIN_VERSION=${MAIN_LATEST_TAG#$TAG_PREFIX}
-          MAIN_MAJOR=$(echo "$MAIN_VERSION" | cut -d. -f1)
-          
           # 버전 증가 로직
           if [[ "${BRANCH_NAME}" == "main" ]]; then
-            MAJOR=$((MAJOR+1))
-            MINOR=0
-            PATCH=0
+            # Hotfix에서 넘어온 경우 Patch 증가
+            if [[ "${MAJOR}" == "${MAIN_MAJOR}" && "${MINOR}" == "${MAIN_MINOR}" ]]; then
+              PATCH=$((PATCH+1))
+            else
+              MAJOR=$((MAJOR+1))
+              MINOR=0
+              PATCH=0
+            fi
+            ENV="prod"
           elif [[ "${BRANCH_NAME}" == "dev" ]]; then
+            # 메이저 동기화 (dev가 main보다 낮으면 메인 기준으로 동기화)
             if [[ "${MAJOR}" -lt "${MAIN_MAJOR}" ]]; then
               MAJOR="${MAIN_MAJOR}"
-              MINOR=0
+              MINOR=1
               PATCH=0
             else
               MINOR=$((MINOR+1))
               PATCH=0
             fi
+            ENV="dev"
           elif [[ "${BRANCH_NAME}" == "hotfix" ]]; then
             PATCH=$((PATCH+1))
+            ENV="hotfix"
           else
             echo "Unsupported branch, skipping tag."
             exit 0
@@ -79,3 +98,8 @@ jobs:
           git checkout -b tags
           git tag "${NEW_TAG}"
           git push origin "refs/tags/${NEW_TAG}"
+          
+          # 태그 정보 저장
+          echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
+          echo "ENV=${ENV}" >> $GITHUB_ENV
+
