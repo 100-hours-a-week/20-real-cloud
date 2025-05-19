@@ -1,4 +1,4 @@
-name: Auto Version Tagging and Release
+name: Auto Version Tagging
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
       - dev
 
 jobs:
-  tag-and-release:
+  tagging:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -24,10 +24,16 @@ jobs:
         if: github.event.pull_request.merged == true
         run: echo "PR is merged, continuing..."
 
-      # 3. 태그 전용 브랜치 체크아웃
+      # 3. 병합된 커밋 ID 가져오기
+      - name: Get Merged Commit SHA
+        id: merged_commit
+        run: |
+          MERGE_COMMIT=$(git rev-parse HEAD)
+          echo "MERGE_COMMIT=${MERGE_COMMIT}" >> $GITHUB_ENV
+
+      # 4. 태그 전용 브랜치 체크아웃
       - name: Checkout Tags Branch
         run: |
-          # 태그 전용 브랜치가 이미 존재하는지 확인
           git fetch origin
           if git ls-remote --heads origin tags | grep -q "refs/heads/tags"; then
             echo "Tags branch exists. Checking out..."
@@ -38,17 +44,15 @@ jobs:
             git checkout --orphan tags
             git commit --allow-empty -m "Initialize tags branch"
             git push origin tags
+            git checkout tags
           fi
 
-      # 4. 버전 태그 생성
+      # 5. 버전 태그 생성
       - name: Generate Version Tag
         id: tag
         env:
           TAG_PREFIX: "v"
         run: |
-          BRANCH_NAME=$(echo "${GITHUB_REF}" | awk -F/ '{print $3}')
-          echo "Branch Name: ${BRANCH_NAME}"
-          
           # 최신 태그 가져오기 (tags 브랜치에서만)
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "${TAG_PREFIX}0.0.0")
           echo "Latest Tag (tags branch): ${LATEST_TAG}"
@@ -72,7 +76,7 @@ jobs:
           PATCH=${PARTS[2]}
           
           # 버전 증가 로직
-          if [[ "${BRANCH_NAME}" == "main" ]]; then
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
             # Main: Patch 증가
             if [[ "${MAJOR}" == "${MAIN_MAJOR}" && "${MINOR}" == "${MAIN_MINOR}" ]]; then
               PATCH=$((PATCH+1))
@@ -82,7 +86,7 @@ jobs:
               PATCH=0
             fi
             ENV="prod"
-          elif [[ "${BRANCH_NAME}" == "dev" ]]; then
+          elif [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
             # 메이저 동기화 (dev가 main보다 낮으면 메인 기준으로 동기화)
             if [[ "${MAJOR}" -lt "${MAIN_MAJOR}" || ( "${MAJOR}" == "${MAIN_MAJOR}" && "${MINOR}" -lt "${MAIN_MINOR}" ) ]]; then
               MAJOR="${MAIN_MAJOR}"
@@ -109,13 +113,14 @@ jobs:
             exit 0
           fi
           
-          # 태그 생성 및 푸시
+          # 병합된 커밋에 태그 추가
+          MERGE_COMMIT=${MERGE_COMMIT}
+          echo "Tagging commit: ${MERGE_COMMIT}"
+          
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           
-          # 태그 전용 브랜치로 푸시
-          git tag "${NEW_TAG}"
-          git push origin "refs/heads/tags"
+          git tag "${NEW_TAG}" "${MERGE_COMMIT}"
           git push origin "refs/tags/${NEW_TAG}"
           
           # 태그 정보 저장
