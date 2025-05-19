@@ -1,16 +1,12 @@
 name: Auto Version Tagging and Release
 
 on:
-  push:
-    branches:
-      - main
-      - dev
-      - hotfix
   pull_request:
+    types:
+      - closed
     branches:
       - main
       - dev
-      - hotfix
 
 jobs:
   tag-and-release:
@@ -23,7 +19,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. 버전 태그 생성
+      # 2. 병합된 PR인지 확인
+      - name: Check if Merged
+        if: github.event.pull_request.merged == true
+        run: echo "PR is merged, continuing..."
+
+      # 3. 버전 태그 생성
       - name: Generate Version Tag
         id: tag
         env:
@@ -57,7 +58,7 @@ jobs:
           
           # 버전 증가 로직
           if [[ "${BRANCH_NAME}" == "main" ]]; then
-            # Hotfix에서 넘어온 경우 Patch 증가
+            # Main: Patch 증가
             if [[ "${MAJOR}" == "${MAIN_MAJOR}" && "${MINOR}" == "${MAIN_MINOR}" ]]; then
               PATCH=$((PATCH+1))
             else
@@ -77,9 +78,6 @@ jobs:
               PATCH=0
             fi
             ENV="dev"
-          elif [[ "${BRANCH_NAME}" == "hotfix" ]]; then
-            PATCH=$((PATCH+1))
-            ENV="hotfix"
           else
             echo "Unsupported branch, skipping tag."
             exit 0
@@ -102,4 +100,3 @@ jobs:
           # 태그 정보 저장
           echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
           echo "ENV=${ENV}" >> $GITHUB_ENV
-
