@@ -13,6 +13,8 @@ on:
 jobs:
   tag-on-merge:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       # 1. 코드 체크아웃
@@ -45,12 +47,10 @@ jobs:
           
           # 버전 증가 로직
           if [[ "${BRANCH_NAME}" == "main" ]]; then
-            # 메인 브랜치: Major 버전 증가
             MAJOR=$((MAJOR+1))
             MINOR=0
             PATCH=0
           elif [[ "${BRANCH_NAME}" == "dev" ]]; then
-            # 메이저 동기화
             if [[ "${MAJOR}" -lt "${MAIN_MAJOR}" ]]; then
               MAJOR="${MAIN_MAJOR}"
               MINOR=0
@@ -60,7 +60,6 @@ jobs:
               PATCH=0
             fi
           elif [[ "${BRANCH_NAME}" == "hotfix" ]]; then
-            # 핫픽스 브랜치: Patch 버전 증가
             PATCH=$((PATCH+1))
           else
             echo "Unsupported branch, skipping tag."
@@ -75,5 +74,8 @@ jobs:
           # 태그 생성 및 푸시
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+          
+          # 태그 전용 브랜치로 푸시
+          git checkout -b tags
           git tag "${NEW_TAG}"
-          git push origin "${NEW_TAG}"
+          git push origin "refs/tags/${NEW_TAG}"
