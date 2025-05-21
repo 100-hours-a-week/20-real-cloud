@@ -7,6 +7,7 @@ on:
     branches:
       - main
       - dev
+      - hotfix/*
 
 jobs:
   tagging:
@@ -31,28 +32,21 @@ jobs:
           MERGE_COMMIT=$(git rev-parse HEAD)
           echo "MERGE_COMMIT=${MERGE_COMMIT}" >> $GITHUB_ENV
 
-      # 4. 태그 전용 브랜치 체크아웃
-      - name: Checkout Tags Branch
-        run: |
-          git fetch origin +refs/tags/*:refs/tags/* +refs/heads/tags:refs/heads/tags
-          git checkout tags || git checkout -b tags origin/tags
-          git pull origin tags
-
-      # 5. 버전 태그 생성
+      # 4. 버전 태그 생성
       - name: Generate Version Tag
         id: tag
         env:
           TAG_PREFIX: "v"
         run: |
-          # 최신 태그 가져오기 (tags 브랜치에서만)
+          # 최신 태그 가져오기
           LATEST_TAG=$(git tag --list "v*" | sort -V | tail -n 1 || echo "${TAG_PREFIX}0.0.0")
-          echo "Latest Tag (tags branch): ${LATEST_TAG}"
+          echo "Latest Tag: ${LATEST_TAG}"
           
           # 메인 브랜치의 최신 태그 확인
           MAIN_LATEST_TAG=$(git ls-remote --tags origin | grep -o "v[0-9]\+\.[0-9]\+\.[0-9]\+" | sort -V | tail -n 1 || echo "v0.0.0")
           echo "Latest Main Tag: ${MAIN_LATEST_TAG}"
           
-          # 최신 태그가 메인 태그보다 낮을 때 동기화
+          # 버전 파싱
           LATEST_VERSION=${LATEST_TAG#$TAG_PREFIX}
           MAIN_VERSION=${MAIN_LATEST_TAG#$TAG_PREFIX}
           IFS='.' read -ra MAIN_PARTS <<< "$MAIN_VERSION"
@@ -60,22 +54,17 @@ jobs:
           MAIN_MINOR=${MAIN_PARTS[1]}
           MAIN_PATCH=${MAIN_PARTS[2]}
           
-          # 버전 파싱
           IFS='.' read -ra PARTS <<< "$LATEST_VERSION"
           MAJOR=${PARTS[0]}
           MINOR=${PARTS[1]}
           PATCH=${PARTS[2]}
           
-          # 버전 증가 로직
+          # 브랜치 확인
           if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
-            # Main: Patch 증가
-            if [[ "${MAJOR}" == "${MAIN_MAJOR}" && "${MINOR}" == "${MAIN_MINOR}" ]]; then
-              PATCH=$((PATCH+1))
-            else
-              MAJOR=$((MAIN_MAJOR+1))
-              MINOR=0
-              PATCH=0
-            fi
+            # Main: 메이저 버전 증가
+            MAJOR=$((MAIN_MAJOR+1))
+            MINOR=0
+            PATCH=0
             ENV="prod"
           elif [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
             # 메이저 동기화 (dev가 main보다 낮으면 메인 기준으로 동기화)
@@ -88,6 +77,12 @@ jobs:
               PATCH=0
             fi
             ENV="dev"
+          elif [[ "${GITHUB_REF}" =~ ^refs/heads/hotfix/ ]]; then
+            # Hotfix: Patch만 증가
+            MAJOR="${MAIN_MAJOR}"
+            MINOR="${MAIN_MINOR}"
+            PATCH=$((MAIN_PATCH+1))
+            ENV="hotfix"
           else
             echo "Unsupported branch, skipping tag."
             exit 0
