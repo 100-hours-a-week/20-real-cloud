@@ -44,7 +44,7 @@ module "iam" {
 module "ec2_sg" {
   source = "../../modules/security_group"
 
-  vpc_id = module.network.vpc_id
+  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
 
   ingress_rules = var.ec2_ingress_rules
   egress_rules  = var.ec2_egress_rules
@@ -56,7 +56,7 @@ module "ec2_sg" {
 module "alb_sg" {
   source = "../../modules/security_group"
 
-  vpc_id = module.network.vpc_id
+  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
 
   ingress_rules = var.alb_ingress_rules
   egress_rules  = var.alb_egress_rules
@@ -68,10 +68,10 @@ module "alb_sg" {
 module "alb" {
   source = "../../modules/alb"
 
-  subnet_ids          = module.network.private_subnet_ids
+  subnet_ids          = [module.network.private_subnet_ids[0], module.network.private_subnet_ids[1]]
   security_group_id   = module.alb_sg.security_group_id
   certificate_arn     = var.ap_acm_certificate_arn
-  target_group_vpc_id = module.network.vpc_id
+  target_group_vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
 
   back_target_group_port  = 8080
   front_target_group_port = 80
@@ -99,7 +99,7 @@ module "compute" {
       instance_type               = "t3.micro"
       subnet_id                   = module.network.public_subnet_ids[0]
       key_name                    = var.key_name
-      security_group_ids          = module.ec2_sg.security_group_id
+      security_group_ids          = [module.ec2_sg.security_group_id]
       associate_public_ip_address = true
       iam_instance_profile        = null
       use_eip                     = true
@@ -110,7 +110,7 @@ module "compute" {
       instance_type               = "t3.micro"
       subnet_id                   = module.network.public_subnet_ids[0]
       key_name                    = var.key_name
-      security_group_ids          = module.ec2_sg.security_group_id
+      security_group_ids          = [module.ec2_sg.security_group_id]
       associate_public_ip_address = true
       iam_instance_profile        = null
       use_eip                     = true
@@ -122,7 +122,7 @@ module "compute" {
       instance_type               = "t3.medium"
       subnet_id                   = module.network.private_subnet_ids[0]
       key_name                    = var.key_name
-      security_group_ids          = module.ec2_sg.security_group_id
+      security_group_ids          = [module.ec2_sg.security_group_id]
       associate_public_ip_address = false
       iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
       use_eip                     = false
@@ -137,8 +137,8 @@ module "compute" {
       ami                  = var.ami_id
       instance_type        = "t3.small"
       key_name             = var.key_name
-      user_data            = file("../../modules/compute/scripts/init_userdata.sh")
-      security_group_ids   = module.ec2_sg.security_group_id
+      user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
+      security_group_ids   = [module.ec2_sg.security_group_id]
       iam_instance_profile = module.iam.s3_iam_instance_profile_name
       alb_target_group_arn = module.alb.tg_front_blue_arn
       subnet_id            = module.network.private_subnet_ids[0]
@@ -148,8 +148,8 @@ module "compute" {
       ami                  = var.ami_id
       instance_type        = "t3.medium"
       key_name             = var.key_name
-      user_data            = file("../../modules/compute/scripts/init_userdata.sh")
-      security_group_ids   = module.ec2_sg.security_group_id
+      user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
+      security_group_ids   = [module.ec2_sg.security_group_id] 
       iam_instance_profile = module.iam.s3_iam_instance_profile_name
       alb_target_group_arn = module.alb.tg_back_blue_arn
       subnet_id            = module.network.private_subnet_ids[0]
