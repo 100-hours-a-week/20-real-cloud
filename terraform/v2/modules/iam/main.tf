@@ -30,10 +30,10 @@ resource "aws_iam_policy" "cloudwatch_agent_policy" {
       {
         Effect = "Allow"
         Action = [
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents",
-            "logs:DescribeLogStreams"
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams"
         ]
         Resource = "*"
       }
@@ -121,7 +121,7 @@ resource "aws_iam_policy" "ssm_policy" {
 
 resource "aws_iam_role_policy_attachment" "ssm_role_attach" {
   role       = aws_iam_role.ssm_role.name
-  policy_arn = aws_iam_policy.ssm_policy.arn 
+  policy_arn = aws_iam_policy.ssm_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "attach_ssm_to_ec2_role" {
@@ -143,8 +143,8 @@ resource "aws_iam_instance_profile" "ssm_profile" {
 # Codedeploy IAM role
 data "aws_iam_policy_document" "code_deploy_policy" {
   statement {
-    sid     = "VisualEditor0"
-    effect  = "Allow"
+    sid    = "VisualEditor0"
+    effect = "Allow"
 
     actions = [
       "iam:PassRole",

@@ -26,9 +26,9 @@ module "iam" {
 module "monitoring_bastion" {
   source = "../../modules/monitoring"
 
-  service_name = var.bastion_service_name
+  service_name      = var.bastion_service_name
   retention_in_days = var.retention_in_days
-  log_group_names = var.bastion_log_group_names
+  log_group_names   = var.bastion_log_group_names
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix

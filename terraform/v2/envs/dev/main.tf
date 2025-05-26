@@ -35,9 +35,9 @@ module "iam" {
 module "monitoring_frontend" {
   source = "../../modules/monitoring"
 
-  service_name = var.front_service_name
+  service_name      = var.front_service_name
   retention_in_days = var.retention_in_days
-  log_group_names = var.front_log_group_names
+  log_group_names   = var.front_log_group_names
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -46,9 +46,9 @@ module "monitoring_frontend" {
 module "monitoring_backend" {
   source = "../../modules/monitoring"
 
-  service_name = var.back_service_name
+  service_name      = var.back_service_name
   retention_in_days = var.retention_in_days
-  log_group_names = var.back_log_group_names
+  log_group_names   = var.back_log_group_names
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -57,10 +57,10 @@ module "monitoring_backend" {
 module "monitoring_database" {
   source = "../../modules/monitoring"
 
-  service_name = var.db_service_name
+  service_name      = var.db_service_name
   retention_in_days = var.retention_in_days
-  log_group_names = var.db_log_group_names
-  
+  log_group_names   = var.db_log_group_names
+
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
