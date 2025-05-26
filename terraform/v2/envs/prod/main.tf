@@ -139,7 +139,7 @@ module "compute" {
       key_name             = var.key_name
       user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
       security_group_ids   = [module.ec2_sg.security_group_id]
-      iam_instance_profile = module.iam.s3_iam_instance_profile_name
+      iam_instance_profile = module.iam.ec2_iam_instance_profile_name
       alb_target_group_arn = module.alb.tg_front_blue_arn
       subnet_id            = module.network.private_subnet_ids[0]
     }
@@ -150,7 +150,7 @@ module "compute" {
       key_name             = var.key_name
       user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
       security_group_ids   = [module.ec2_sg.security_group_id] 
-      iam_instance_profile = module.iam.s3_iam_instance_profile_name
+      iam_instance_profile = module.iam.ec2_iam_instance_profile_name
       alb_target_group_arn = module.alb.tg_back_blue_arn
       subnet_id            = module.network.private_subnet_ids[0]
     }
