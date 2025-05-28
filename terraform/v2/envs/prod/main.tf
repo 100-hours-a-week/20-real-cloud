@@ -182,3 +182,35 @@ module "monitoring_database" {
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
+
+module "deployment_next_prod" {
+  source = "../../modules/deployment"
+
+  app_name               = "next"
+  deployment_group_name  = "next-prod-deployment-group"
+  service_role_arn       = module.iam.codedeploy_iam_role_arn
+  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+
+  auto_scaling_groups = ["${var.name_prefix}-front-blue-asg"]
+  listener_arn        = module.alb.listener_front_arn
+  target_group_blue   = module.alb.tg_front_blue_name
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+module "deployment_spring_prod" {
+  source = "../../modules/deployment"
+
+  app_name               = "spring"
+  deployment_group_name  = "spring-prod-deployment-group"
+  service_role_arn       = module.iam.codedeploy_iam_role_arn
+  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+
+  auto_scaling_groups = ["${var.name_prefix}-back-blue-asg"]
+  listener_arn        = module.alb.listener_back_arn
+  target_group_blue   = module.alb.tg_back_blue_name
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}

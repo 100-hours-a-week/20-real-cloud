@@ -34,17 +34,24 @@ variable "target_group_blue" {
   type        = string
 }
 
-variable "target_group_green" {
-  description = "Name of the green target group"
-  type        = string
-}
-
 variable "listener_arn" {
-  description = "Load balancer listener ARN"
+  description = "Load balancer listener ARN for production traffic"
   type        = string
 }
 
 variable "auto_scaling_groups" {
   description = "List of Auto Scaling Groups for deployment"
   type        = list(string)
+}
+
+variable "deployment_config_name" {
+  description = "Name of the deployment configuration"
+  type        = string
+  default     = "CodeDeployDefault.AllAtOnce"
+}
+
+variable "alarm_names" {
+  description = "List of CloudWatch alarm names to monitor during deployment"
+  type        = list(string)
+  default     = []
 } 
