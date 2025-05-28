@@ -18,3 +18,8 @@ output "ssm_iam_instance_profile_name" {
   description = "Instance profile name for the SSM role"
   value       = aws_iam_instance_profile.ssm_profile.name
 }
+
+output "codedeploy_iam_role_arn" {
+  description = "ARN of the CodeDeploy IAM role"
+  value       = aws_iam_role.codedeploy_role.arn
+}

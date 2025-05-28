@@ -165,3 +165,10 @@ resource "aws_iam_role_policy_attachment" "attach_code_deploy_to_ec2_role" {
   role       = aws_iam_role.ec2_role.name
   policy_arn = aws_iam_policy.code_deploy_policy.arn
 }
+
+resource "aws_iam_role" "codedeploy_role" {
+  name               = "${var.name_prefix}-${var.common_tags.Environment}-codedeploy-role"
+  assume_role_policy = data.aws_iam_policy_document.code_deploy_policy.json
+}
+
+
