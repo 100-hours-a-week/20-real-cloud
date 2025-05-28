@@ -4,14 +4,14 @@ output "cloudwatch_agent_agent_profile_name" {
 }
 
 
-# s3_role + ssm_role
-output "s3_iam_role_arn" {
-  description = "ARN of the combined S3 backend IAM role"
-  value       = aws_iam_role.s3_role.arn
+# s3_role + ssm_role + codedeploy_role
+output "ec2_iam_role_arn" {
+  description = "ARN of the EC2 IAM role"
+  value       = aws_iam_role.ec2_role.arn
 }
-output "s3_iam_instance_profile_name" {
-  description = "Instance profile name for the combined S3 backend role"
-  value       = aws_iam_instance_profile.s3_profile.name
+output "ec2_iam_instance_profile_name" {
+  description = "Instance profile name for the EC2 role"
+  value       = aws_iam_instance_profile.ec2_profile.name
 }
 
 output "ssm_iam_instance_profile_name" {
