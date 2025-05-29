@@ -12,7 +12,7 @@ usermod -aG docker ec2-user
 
 # 3. Install CodeDeploy Agent
 cd /home/ec2-user
-wget https://bucket-name.s3.region-identifier.amazonaws.com/latest/install
+wget https://aws-codedeploy-ap-northeast-2.s3.amazonaws.com/latest/install
 chmod +x ./install
 sudo ./install auto
 systemctl start codedeploy-agent
