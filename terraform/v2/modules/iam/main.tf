@@ -238,7 +238,7 @@ data "aws_iam_policy_document" "code_deploy_advanced_policy" {
 
 resource "aws_iam_policy" "code_deploy_advanced_policy" {
   name   = "${var.name_prefix}-${var.common_tags.Environment}-code-deploy-advanced-policy"
-  policy = data.aws_iam_policy_document.asg_advanced_policy.json
+  policy = data.aws_iam_policy_document.code_deploy_advanced_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "attach_code_deploy_advanced_to_cd_role" {
