@@ -88,6 +88,17 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   )
 }
 
+resource "aws_iam_role_policy_attachment" "attach_ecr_readonly_to_ec2_role" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+resource "aws_iam_role_policy_attachment" "attach_codedeploy_deployer_to_ec2_role" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployDeployerAccess"
+}
+
+
 
 # SSM IAM role
 resource "aws_iam_role" "ssm_role" {
@@ -172,3 +183,65 @@ resource "aws_iam_role" "codedeploy_role" {
 }
 
 
+#Auto Scaling, EC2, ELB, CloudWatch, SNS, Tag role for codedeploy
+data "aws_iam_policy_document" "code_deploy_advanced_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "autoscaling:CompleteLifecycleAction",
+      "autoscaling:DeleteLifecycleHook",
+      "autoscaling:DescribeAutoScalingGroups",
+      "autoscaling:DescribeLifecycleHooks",
+      "autoscaling:PutLifecycleHook",
+      "autoscaling:RecordLifecycleActionHeartbeat",
+      "autoscaling:CreateAutoScalingGroup",
+      "autoscaling:CreateOrUpdateTags",
+      "autoscaling:UpdateAutoScalingGroup",
+      "autoscaling:EnableMetricsCollection",
+      "autoscaling:DescribePolicies",
+      "autoscaling:DescribeScheduledActions",
+      "autoscaling:DescribeNotificationConfigurations",
+      "autoscaling:SuspendProcesses",
+      "autoscaling:ResumeProcesses",
+      "autoscaling:AttachLoadBalancers",
+      "autoscaling:AttachLoadBalancerTargetGroups",
+      "autoscaling:PutScalingPolicy",
+      "autoscaling:PutScheduledUpdateGroupAction",
+      "autoscaling:PutNotificationConfiguration",
+      "autoscaling:PutWarmPool",
+      "autoscaling:DescribeScalingActivities",
+      "autoscaling:DeleteAutoScalingGroup",
+      "autoscaling:DescribeAutoScalingInstances",
+      "autoscaling:SetInstanceHealth",
+      "autoscaling:TerminateInstanceInAutoScalingGroup",
+      "ec2:DescribeInstances",
+      "ec2:DescribeInstanceStatus",
+      "ec2:TerminateInstances",
+      "tag:GetResources",
+      "sns:Publish",
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:PutMetricAlarm",
+      "elasticloadbalancing:DescribeLoadBalancerAttributes",
+      "elasticloadbalancing:DescribeTargetGroupAttributes",
+      "elasticloadbalancing:DescribeLoadBalancers",
+      "elasticloadbalancing:DescribeInstanceHealth",
+      "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+      "elasticloadbalancing:DescribeTargetGroups",
+      "elasticloadbalancing:DescribeTargetHealth",
+      "elasticloadbalancing:RegisterTargets",
+      "elasticloadbalancing:DeregisterTargets"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "code_deploy_advanced_policy" {
+  name   = "${var.name_prefix}-${var.common_tags.Environment}-code-deploy-advanced-policy"
+  policy = data.aws_iam_policy_document.asg_advanced_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "attach_code_deploy_advanced_to_cd_role" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = aws_iam_policy.code_deploy_advanced_policy.arn
+}
