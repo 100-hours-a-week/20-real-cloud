@@ -162,8 +162,6 @@ data "aws_iam_policy_document" "code_deploy_policy" {
       "ec2:CreateTags",
       "ec2:RunInstances",
     ]
-
-    resources = ["*"]
   }
 }
 
