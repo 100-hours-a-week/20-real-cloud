@@ -162,6 +162,8 @@ data "aws_iam_policy_document" "code_deploy_policy" {
       "ec2:CreateTags",
       "ec2:RunInstances",
     ]
+
+    resources = ["*"]
   }
 }
 
@@ -177,7 +179,7 @@ resource "aws_iam_role_policy_attachment" "attach_code_deploy_to_ec2_role" {
 
 resource "aws_iam_role" "codedeploy_role" {
   name               = "${var.name_prefix}-${var.common_tags.Environment}-codedeploy-role"
-  assume_role_policy = data.aws_iam_policy_document.code_deploy_policy.json
+  assume_role_policy = data.aws_iam_policy_document.ec2_assume.json
 }
 
 
