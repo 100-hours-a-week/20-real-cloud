@@ -72,7 +72,7 @@ resource "aws_launch_template" "this" {
 resource "aws_autoscaling_group" "fe_blue" {
   for_each = var.lanch_templates
 
-  name_prefix               = "${var.name_prefix}-${each.key}-asg"
+  name                      = "${var.name_prefix}-${each.key}-asg"
   vpc_zone_identifier       = [each.value.subnet_id]
   desired_capacity          = 1
   min_size                  = 1
