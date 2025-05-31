@@ -37,8 +37,8 @@ module "network" {
 module "iam" {
   source = "../../modules/iam"
 
-  static_bucket_arn = var.static_bucket_arn
-  log_bucket_arn    = var.log_bucket_arn
+  static_bucket_arn         = var.static_bucket_arn
+  log_bucket_arn            = var.log_bucket_arn
   fe_code_deploy_bucket_arn = module.deployment_next_prod.code_deploy_bucket_arn
   be_code_deploy_bucket_arn = module.deployment_spring_prod.code_deploy_bucket_arn
 
