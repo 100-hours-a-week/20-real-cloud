@@ -7,6 +7,17 @@ variable "log_bucket_arn" {
   type        = string
 }
 
+variable "fe_code_deploy_bucket_arn" {
+  description = "ARN of the S3 bucket for code deploy setting files"
+  type        = string
+}
+
+variable "be_code_deploy_bucket_arn" {
+  description = "ARN of the S3 bucket for code deploy setting files"
+  type        = string
+}
+
+
 variable "module_name" {
   description = "Module name"
   type        = string
