@@ -37,10 +37,12 @@ module "network" {
 module "iam" {
   source = "../../modules/iam"
 
+  static_bucket_arn = var.static_bucket_arn
+  log_bucket_arn    = var.log_bucket_arn
+
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
-
 module "ec2_sg" {
   source = "../../modules/security_group"
 
@@ -119,7 +121,7 @@ module "compute" {
 
     "database" = {
       ami                         = var.ami_id
-      instance_type               = "t3.medium"
+      instance_type               = "t3.small"
       subnet_id                   = module.network.private_subnet_ids[0]
       key_name                    = var.key_name
       security_group_ids          = [module.ec2_sg.security_group_id]

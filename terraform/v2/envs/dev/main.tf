@@ -28,6 +28,9 @@ module "network" {
 module "iam" {
   source = "../../modules/iam"
 
+  static_bucket_arn = var.static_bucket_arn
+  log_bucket_arn    = var.log_bucket_arn
+  
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }

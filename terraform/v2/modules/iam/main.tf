@@ -151,6 +151,54 @@ resource "aws_iam_instance_profile" "ssm_profile" {
   )
 }
 
+# S3 IAM role attachment 
+resource "aws_iam_policy" "s3_static_policy" {
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = "${var.static_bucket_arn}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "${var.static_bucket_arn}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "s3_log_policy" {
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "s3:PutObject"
+        Resource = "${var.log_bucket_arn}/*"
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role_policy_attachment" "attach_static_s3_to_ec2_role" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = aws_iam_policy.s3_static_policy.arn
+}
+resource "aws_iam_role_policy_attachment" "attach_log_s3_to_ec2_role" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = aws_iam_policy.s3_log_policy.arn
+}
+
 # Codedeploy IAM role
 data "aws_iam_policy_document" "code_deploy_policy" {
   statement {
@@ -167,23 +215,17 @@ data "aws_iam_policy_document" "code_deploy_policy" {
   }
 }
 
-resource "aws_iam_policy" "code_deploy_policy" {
-  name   = "${var.name_prefix}-${var.common_tags.Environment}-code-deploy-policy"
-  policy = data.aws_iam_policy_document.code_deploy_policy.json
+data "aws_iam_policy_document" "codedeploy_assume" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["codedeploy.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
 }
 
-resource "aws_iam_role_policy_attachment" "attach_code_deploy_to_ec2_role" {
-  role       = aws_iam_role.ec2_role.name
-  policy_arn = aws_iam_policy.code_deploy_policy.arn
-}
-
-resource "aws_iam_role" "codedeploy_role" {
-  name               = "${var.name_prefix}-${var.common_tags.Environment}-codedeploy-role"
-  assume_role_policy = data.aws_iam_policy_document.ec2_assume.json
-}
-
-
-#Auto Scaling, EC2, ELB, CloudWatch, SNS, Tag role for codedeploy
 data "aws_iam_policy_document" "code_deploy_advanced_policy" {
   statement {
     effect = "Allow"
@@ -235,13 +277,34 @@ data "aws_iam_policy_document" "code_deploy_advanced_policy" {
     resources = ["*"]
   }
 }
+resource "aws_iam_role" "codedeploy_role" {
+  name               = "${var.name_prefix}-${var.common_tags.Environment}-codedeploy-role"
+  assume_role_policy = data.aws_iam_policy_document.codedeploy_assume.json
+}
+resource "aws_iam_policy" "code_deploy_policy" {
+  name   = "${var.name_prefix}-${var.common_tags.Environment}-code-deploy-policy"
+  policy = data.aws_iam_policy_document.code_deploy_policy.json
+}
 
 resource "aws_iam_policy" "code_deploy_advanced_policy" {
   name   = "${var.name_prefix}-${var.common_tags.Environment}-code-deploy-advanced-policy"
   policy = data.aws_iam_policy_document.code_deploy_advanced_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "attach_code_deploy_advanced_to_cd_role" {
-  role       = aws_iam_role.ec2_role.name
+resource "aws_iam_role_policy_attachment" "attach_code_deploy_role" {
+  role       = aws_iam_role.codedeploy_role.name
+  policy_arn = aws_iam_policy.code_deploy_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "AWSCodeDeployRole_policy" {
+  role       = aws_iam_role.codedeploy_role.name
   policy_arn = aws_iam_policy.code_deploy_advanced_policy.arn
+}
+resource "aws_iam_role_policy_attachment" "AWSCodeDeployDeployerAccess_policy" {
+  role       = aws_iam_role.codedeploy_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployDeployerAccess"
+}
+resource "aws_iam_role_policy_attachment" "codedeploy_managed_policy" {
+  role       = aws_iam_role.codedeploy_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
