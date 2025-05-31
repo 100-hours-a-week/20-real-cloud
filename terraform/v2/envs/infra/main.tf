@@ -16,13 +16,6 @@ module "network" {
   name_prefix = local.name_prefix
 }
 
-module "iam" {
-  source = "../../modules/iam"
-
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
-
 module "monitoring_bastion" {
   source = "../../modules/monitoring"
 

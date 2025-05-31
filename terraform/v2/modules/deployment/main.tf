@@ -40,8 +40,7 @@ resource "aws_codedeploy_deployment_group" "this" {
     }
 
     deployment_ready_option {
-      action_on_timeout    = "CONTINUE_DEPLOYMENT"
-      wait_time_in_minutes = 5
+      action_on_timeout = "CONTINUE_DEPLOYMENT"
     }
 
 
@@ -52,15 +51,12 @@ resource "aws_codedeploy_deployment_group" "this" {
   }
 
   load_balancer_info {
-    target_group_pair_info {
-      prod_traffic_route {
-        listener_arns = [var.listener_arn]
-      }
 
-      target_group {
-        name = var.target_group_blue
-      }
+    target_group_info {
+      name = var.target_group_blue
     }
+
+
   }
 
   auto_rollback_configuration {

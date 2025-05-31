@@ -170,3 +170,13 @@ variable "assignee_tag" {
   description = "Write down Assignee Tag"
   type        = string
 }
+
+#IAM
+variable "static_bucket_arn" {
+  description = "ARN of the S3 bucket for static files"
+  type        = string
+}
+variable "log_bucket_arn" {
+  description = "ARN of the S3 bucket for log files"
+  type        = string
+}

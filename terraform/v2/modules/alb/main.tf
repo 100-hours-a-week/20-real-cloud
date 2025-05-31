@@ -38,29 +38,6 @@ resource "aws_lb_target_group" "back_blue" {
   )
 }
 
-resource "aws_lb_target_group" "back_green" {
-  name     = "${var.name_prefix}-${var.common_tags.Environment}-tg-back-green"
-  port     = var.back_target_group_port
-  protocol = "HTTP"
-  vpc_id   = var.target_group_vpc_id
-
-  health_check {
-    path                = "/api/healthz"
-    protocol            = "HTTP"
-    matcher             = "200"
-    interval            = 30
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-
-  tags = merge(
-    local.default_tags,
-    {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-tg-back-green"
-    }
-  )
-}
-
 resource "aws_lb_target_group" "front_blue" {
   name     = "${var.name_prefix}-${var.common_tags.Environment}-tg-front-blue"
   port     = var.front_target_group_port
@@ -80,29 +57,6 @@ resource "aws_lb_target_group" "front_blue" {
     local.default_tags,
     {
       Name = "${var.name_prefix}-${var.common_tags.Environment}-tg-front-blue"
-    }
-  )
-}
-
-resource "aws_lb_target_group" "front_green" {
-  name     = "${var.name_prefix}-${var.common_tags.Environment}-tg-front-green"
-  port     = var.front_target_group_port
-  protocol = "HTTP"
-  vpc_id   = var.target_group_vpc_id
-
-  health_check {
-    path                = "/healthz"
-    protocol            = "HTTP"
-    matcher             = "200"
-    interval            = 30
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-
-  tags = merge(
-    local.default_tags,
-    {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-tg-front-green"
     }
   )
 }
