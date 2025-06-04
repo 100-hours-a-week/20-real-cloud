@@ -48,6 +48,42 @@ module "ec2_sg" {
   name_prefix = local.name_prefix
 }
 
+module "sg_application" {
+  source = "../../modules/security_group"
+
+  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
+
+  ingress_rules = module.sg_application.ingress_rules
+  egress_rules  = module.sg_application.egress_rules
+
+  common_tags = local.common_tags
+  name_prefix = "${local.name_prefix}-app"
+}
+
+module "sg_database" {
+  source = "../../modules/security_group"
+
+  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
+
+  ingress_rules = module.sg_database.ingress_rules
+  egress_rules  = module.sg_database.egress_rules
+
+  common_tags = local.common_tags
+  name_prefix = "${local.name_prefix}-db"
+}
+
+module "sg_monitoring" {
+  source = "../../modules/security_group"
+
+  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
+
+  ingress_rules = module.sg_monitoring.ingress_rules
+  egress_rules  = module.sg_monitoring.egress_rules
+
+  common_tags = local.common_tags
+  name_prefix = "${local.name_prefix}-mon"
+}
+
 module "compute" {
   source = "../../modules/compute"
   ec2_instances = {
@@ -57,7 +93,7 @@ module "compute" {
       instance_type               = "t3.small"
       subnet_id                   = module.network.private_subnet_ids[0]
       key_name                    = var.key_name
-      security_group_ids          = [module.ec2_sg.security_group_id]
+      security_group_ids          = [module.sg_application.security_group_id]
       associate_public_ip_address = false
       iam_instance_profile        = module.iam.ec2_iam_instance_profile_name
       use_eip                     = false
@@ -68,7 +104,7 @@ module "compute" {
       instance_type               = "t3.small"
       subnet_id                   = module.network.private_subnet_ids[1]
       key_name                    = var.key_name
-      security_group_ids          = [module.ec2_sg.security_group_id]
+      security_group_ids          = [module.sg_database.security_group_id]
       associate_public_ip_address = false
       iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
       use_eip                     = false
