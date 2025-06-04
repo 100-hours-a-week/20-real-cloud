@@ -94,7 +94,7 @@ module "compute" {
       key_name                    = var.key_name
       security_group_ids          = [module.ec2_sg.security_group_id]
       associate_public_ip_address = true
-      iam_instance_profile        = null
+      iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
       use_eip                     = true
       user_data                   = file("../../modules/compute/scripts/bastion_userdata.sh")
     }
