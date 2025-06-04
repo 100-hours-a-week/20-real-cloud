@@ -2,42 +2,40 @@
 set -e
 
 # 1. 기본 패키지 설치
-yum update -y
-yum install -y git awscli wget unzip
+dnf update -y
+dnf install -y git awscli wget unzip
 
-# 2. MySQL & Redis 설치
-wget https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
-yum localinstall -y mysql80-community-release-el7-3.noarch.rpm
-yum install -y mysql-community-server
-amazon-linux-extras enable redis6
-yum clean metadata
-yum install -y redis
+# 2. MySQL 8.0 설치 (기본 저장소)
+dnf install -y mysql-server
 
-# 3. 서비스 시작
+# 3. Redis 설치 (redis6은 amazon-linux-extras 없음)
+dnf install -y redis
+
+# 4. 서비스 시작
 systemctl enable mysqld
 systemctl start mysqld
 systemctl enable redis
 systemctl start redis
 
-# 4. 비밀번호 SSM에서 가져오기
+# 5. 비밀번호 SSM에서 가져오기
 MYSQL_ROOT_PASSWORD=$(aws ssm get-parameter --name "/config/prod/db_passwd" --with-decryption --query "Parameter.Value" --output text)
 DB_USERNAME=$(aws ssm get-parameter --name "/config/prod/db_user" --with-decryption --query "Parameter.Value" --output text)
 DB_PASSWORD=$(aws ssm get-parameter --name "/config/prod/db_passwd" --with-decryption --query "Parameter.Value" --output text)
 
-# 5. MySQL 초기 비밀번호 변경
-MYSQL_TEMP_PASS=$(grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}')
-mysql -u root -p"$MYSQL_TEMP_PASS" --connect-expired-password <<EOF
+# 6. MySQL 초기 비밀번호 설정
+# AL2023의 mysqld는 기본 설정으로 비밀번호 없음 (확인 필요 시 /var/log/mysqld.log)
+mysql -u root <<EOF
 ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';
 EOF
 
-# 6. DB 사용자 생성 및 권한 부여
+# 7. DB 사용자 생성 및 권한 부여
 mysql -u root -p"$MYSQL_ROOT_PASSWORD" <<EOF
 CREATE USER IF NOT EXISTS '$DB_USERNAME'@'%' IDENTIFIED BY '$DB_PASSWORD';
 GRANT ALL PRIVILEGES ON *.* TO '$DB_USERNAME'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 EOF
 
-# 7. 최신 Dump 복원
+# 8. 최신 Dump 복원
 S3_BUCKET="s3://ktb-ca-mvp-log/mysql-backup"
 TMP_DIR="/tmp/mysql_restore"
 mkdir -p $TMP_DIR
@@ -45,7 +43,7 @@ LATEST_DUMP=$(aws s3 ls $S3_BUCKET/ | sort | tail -n 1 | awk '{print $4}')
 aws s3 cp "$S3_BUCKET/$LATEST_DUMP" "$TMP_DIR/latest_dump.sql"
 mysql -u root -p"$MYSQL_ROOT_PASSWORD" < "$TMP_DIR/latest_dump.sql"
 
-# 8. 크론잡 스크립트 (Dump, 로그 업로드)
+# 9. 크론잡 스크립트
 CRON_SCRIPT="/usr/local/bin/mysql_s3_backup.sh"
 LOG_SCRIPT="/usr/local/bin/mysql_log_upload.sh"
 
