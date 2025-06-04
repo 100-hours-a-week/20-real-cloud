@@ -19,7 +19,7 @@ systemctl start codedeploy-agent
 systemctl enable codedeploy-agent
 
 cd /home/ec2-user
-wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.38.0/opentelemetry-javaagent.jar -O otel-agent.jar
+wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.15.0/opentelemetry-javaagent.jar -O otel-agent.jar
 
 # 4. 폴더 생성
 mkdir /home/ec2-user/logs
