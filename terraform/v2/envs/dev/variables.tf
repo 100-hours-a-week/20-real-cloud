@@ -152,11 +152,11 @@ variable "ec2_egress_rules" {
   }))
   default = []
 }
-variable  "next_prod_code_deploy_bucket_arn"{
+variable "next_prod_code_deploy_bucket_arn" {
   description = "ARN of the S3 bucket for Next.js code deployment"
   type        = string
 }
-variable  "spring_prod_code_deploy_bucket_arn"{
+variable "spring_prod_code_deploy_bucket_arn" {
   description = "ARN of the S3 bucket for spring code deployment"
   type        = string
 }
