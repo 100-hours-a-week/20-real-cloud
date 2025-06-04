@@ -115,3 +115,48 @@ variable "log_bucket_arn" {
   description = "ARN of the S3 bucket for log files"
   type        = string
 }
+
+#compute
+variable "ami_id" {
+  description = "The AMI ID for the instance."
+  type        = string
+}
+
+variable "key_name" {
+  description = "The key pair name to use for SSH access."
+  type        = string
+}
+
+
+#security groups
+variable "ec2_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "ec2_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+variable  "next_prod_code_deploy_bucket_arn"{
+  description = "ARN of the S3 bucket for Next.js code deployment"
+  type        = string
+}
+variable  "spring_prod_code_deploy_bucket_arn"{
+  description = "ARN of the S3 bucket for spring code deployment"
+  type        = string
+}
