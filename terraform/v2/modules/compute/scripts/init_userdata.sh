@@ -3,7 +3,7 @@ set -e
 
 # 1. Update & basic packages
 yum update -y
-yum install -y ruby wget unzip docker curl git
+yum install -y ruby wget unzip docker git
 
 # 2. Start Docker
 systemctl start docker
