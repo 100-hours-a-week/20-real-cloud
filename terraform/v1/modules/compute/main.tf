@@ -20,7 +20,7 @@ resource "aws_instance" "ec2" {
   )
 }
 
-resource "aws_eip" "ec2_eip" {  
+resource "aws_eip" "ec2_eip" {
 
   tags = merge(
     local.default_tags,
