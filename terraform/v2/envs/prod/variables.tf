@@ -131,6 +131,78 @@ variable "alb_egress_rules" {
   default = []
 }
 
+variable "database_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "database_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "application_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "application_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "monitoring_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "monitoring_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
 #cdn
 variable "us_acm_certificate_arn" {
   description = "The ARN of the ACM certificate to use for HTTPS"

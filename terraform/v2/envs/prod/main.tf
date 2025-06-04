@@ -45,6 +45,7 @@ module "iam" {
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
+
 module "ec2_sg" {
   source = "../../modules/security_group"
 
@@ -69,37 +70,37 @@ module "alb_sg" {
   name_prefix = local.name_prefix
 }
 
-module "sg_application" {
+module "database_sg" {
   source = "../../modules/security_group"
 
   vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
 
-  ingress_rules = module.sg_application.ingress_rules
-  egress_rules  = module.sg_application.egress_rules
-
-  common_tags = local.common_tags
-  name_prefix = "${local.name_prefix}-app"
-}
-
-module "sg_database" {
-  source = "../../modules/security_group"
-
-  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
-
-  ingress_rules = module.sg_database.ingress_rules
-  egress_rules  = module.sg_database.egress_rules
+  ingress_rules = var.database_ingress_rules
+  egress_rules  = var.database_egress_rules
 
   common_tags = local.common_tags
   name_prefix = "${local.name_prefix}-db"
 }
 
-module "sg_monitoring" {
+module "application_sg" {
   source = "../../modules/security_group"
 
   vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
 
-  ingress_rules = module.sg_monitoring.ingress_rules
-  egress_rules  = module.sg_monitoring.egress_rules
+  ingress_rules = var.application_ingress_rules
+  egress_rules  = var.application_egress_rules
+
+  common_tags = local.common_tags
+  name_prefix = "${local.name_prefix}-app"
+}
+
+module "monitoring_sg" {
+  source = "../../modules/security_group"
+
+  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
+
+  ingress_rules = var.monitoring_ingress_rules
+  egress_rules  = var.monitoring_egress_rules
 
   common_tags = local.common_tags
   name_prefix = "${local.name_prefix}-mon"
@@ -139,7 +140,7 @@ module "compute" {
       instance_type               = "t3.micro"
       subnet_id                   = module.network.public_subnet_ids[0]
       key_name                    = var.key_name
-      security_group_ids          = [module.sg_monitoring.security_group_id]
+      security_group_ids          = [module.monitoring_sg.security_group_id]
       associate_public_ip_address = true
       iam_instance_profile        = null
       use_eip                     = true
@@ -151,7 +152,7 @@ module "compute" {
       instance_type               = "t3.small"
       subnet_id                   = module.network.private_subnet_ids[2]
       key_name                    = var.key_name
-      security_group_ids          = [module.sg_database.security_group_id]
+      security_group_ids          = [module.database_sg.security_group_id]
       associate_public_ip_address = false
       iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
       use_eip                     = false
@@ -167,7 +168,7 @@ module "compute" {
       instance_type        = "t3.small"
       key_name             = var.key_name
       user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
-      security_group_ids   = [module.sg_application.security_group_id]
+      security_group_ids   = [module.application_sg.security_group_id]
       iam_instance_profile = module.iam.ec2_iam_instance_profile_name
       alb_target_group_arn = module.alb.tg_front_blue_arn
       subnet_id            = module.network.private_subnet_ids[0]
@@ -178,7 +179,7 @@ module "compute" {
       instance_type        = "t3.medium"
       key_name             = var.key_name
       user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
-      security_group_ids   = [module.sg_application.security_group_id]
+      security_group_ids   = [module.application_sg.security_group_id]
       iam_instance_profile = module.iam.ec2_iam_instance_profile_name
       alb_target_group_arn = module.alb.tg_back_blue_arn
       subnet_id            = module.network.private_subnet_ids[0]
