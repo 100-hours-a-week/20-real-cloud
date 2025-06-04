@@ -53,8 +53,8 @@ module "sg_application" {
 
   vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
 
-  ingress_rules = module.sg_application.ingress_rules
-  egress_rules  = module.sg_application.egress_rules
+  ingress_rules = var.application_ingress_rules
+  egress_rules  = var.application_egress_rules
 
   common_tags = local.common_tags
   name_prefix = "${local.name_prefix}-app"
@@ -65,23 +65,11 @@ module "sg_database" {
 
   vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
 
-  ingress_rules = module.sg_database.ingress_rules
-  egress_rules  = module.sg_database.egress_rules
+  ingress_rules = var.database_ingress_rules
+  egress_rules  = var.database_egress_rules
 
   common_tags = local.common_tags
   name_prefix = "${local.name_prefix}-db"
-}
-
-module "sg_monitoring" {
-  source = "../../modules/security_group"
-
-  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
-
-  ingress_rules = module.sg_monitoring.ingress_rules
-  egress_rules  = module.sg_monitoring.egress_rules
-
-  common_tags = local.common_tags
-  name_prefix = "${local.name_prefix}-mon"
 }
 
 module "compute" {

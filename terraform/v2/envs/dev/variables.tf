@@ -160,3 +160,58 @@ variable "spring_prod_code_deploy_bucket_arn" {
   description = "ARN of the S3 bucket for spring code deployment"
   type        = string
 }
+
+variable "application_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "application_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "database_ingress_rules" {
+  description = "Security Group's Ingress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "database_egress_rules" {
+  description = "Security Group's Egress rules"
+  type = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+
+
+
+
+
+
