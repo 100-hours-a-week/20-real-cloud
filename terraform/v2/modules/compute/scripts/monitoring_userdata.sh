@@ -3,7 +3,7 @@ set -e
 
 # 1. 필수 패키지 설치
 yum update -y
-yum install -y docker curl git unzip
+yum install -y docker git unzip
 
 # 2. Docker 설치 및 실행
 systemctl start docker

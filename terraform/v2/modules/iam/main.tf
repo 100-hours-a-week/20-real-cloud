@@ -166,12 +166,12 @@ resource "aws_iam_role_policy_attachment" "attach_log_s3_to_ec2_role" {
   policy_arn = aws_iam_policy.s3_log_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "attach_code_deploy_s3_to_ec2_role" {
+resource "aws_iam_role_policy_attachment" "attach_fe_code_deploy_s3_to_ec2_role" {
   role       = aws_iam_role.ec2_role.name
   policy_arn = aws_iam_policy.s3_fe_code_deploy_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "attach_code_deploy_s3_to_ec2_role" {
+resource "aws_iam_role_policy_attachment" "attach_be_code_deploy_s3_to_ec2_role" {
   role       = aws_iam_role.ec2_role.name
   policy_arn = aws_iam_policy.s3_be_code_deploy_policy.arn
 }

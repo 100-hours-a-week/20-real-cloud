@@ -3,7 +3,7 @@ set -e
 
 # 1. Update & basic packages
 yum update -y
-yum install -y ruby wget unzip docker curl git
+yum install -y ruby wget unzip docker git
 
 # 2. Start Docker
 systemctl start docker
@@ -20,6 +20,9 @@ systemctl enable codedeploy-agent
 
 cd /home/ec2-user
 wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.38.0/opentelemetry-javaagent.jar -O otel-agent.jar
+
+# 4. 폴더 생성
+mkdir /home/ec2-user/logs
 
 # Done
 echo "✅ Setup complete: Docker + CodeDeploy Agent + SigNoz OTEL Agent"

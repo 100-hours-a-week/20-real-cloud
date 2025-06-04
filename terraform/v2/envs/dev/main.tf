@@ -25,12 +25,61 @@ module "network" {
   name_prefix = local.name_prefix
 }
 
-# module "iam" {
-#   source = "../../modules/iam"
+module "iam" {
+  source = "../../modules/iam"
 
-#   static_bucket_arn = var.static_bucket_arn
-#   log_bucket_arn    = var.log_bucket_arn
+  static_bucket_arn         = var.static_bucket_arn
+  log_bucket_arn            = var.log_bucket_arn
+  fe_code_deploy_bucket_arn = var.next_prod_code_deploy_bucket_arn
+  be_code_deploy_bucket_arn = var.spring_prod_code_deploy_bucket_arn
 
-#   common_tags = local.common_tags
-#   name_prefix = local.name_prefix
-# }
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+module "ec2_sg" {
+  source = "../../modules/security_group"
+
+  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
+
+  ingress_rules = var.ec2_ingress_rules
+  egress_rules  = var.ec2_egress_rules
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+module "compute" {
+  source = "../../modules/compute"
+  ec2_instances = {
+
+    "application" = {
+      ami                         = var.ami_id
+      instance_type               = "t3.small"
+      subnet_id                   = module.network.private_subnet_ids[0]
+      key_name                    = var.key_name
+      security_group_ids          = [module.ec2_sg.security_group_id]
+      associate_public_ip_address = false
+      iam_instance_profile        = module.iam.ec2_iam_instance_profile_name
+      use_eip                     = false
+      user_data                   = file("../../modules/compute/scripts/init_userdata.sh")
+    }
+    "database" = {
+      ami                         = var.ami_id
+      instance_type               = "t3.small"
+      subnet_id                   = module.network.private_subnet_ids[1]
+      key_name                    = var.key_name
+      security_group_ids          = [module.ec2_sg.security_group_id]
+      associate_public_ip_address = false
+      iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
+      use_eip                     = false
+      user_data                   = file("../../modules/compute/scripts/db_userdata.sh")
+    }
+
+  }
+
+  # ASG + Launch Template 정의
+  lanch_templates = {}
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}

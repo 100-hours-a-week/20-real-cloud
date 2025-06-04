@@ -39,8 +39,8 @@ module "iam" {
 
   static_bucket_arn         = var.static_bucket_arn
   log_bucket_arn            = var.log_bucket_arn
-  fe_code_deploy_bucket_arn = module.deployment_next_prod.code_deploy_bucket_arn
-  be_code_deploy_bucket_arn = module.deployment_spring_prod.code_deploy_bucket_arn
+  fe_code_deploy_bucket_arn = module.deployment_next_prod.codedeploy_s3_bucket_arn
+  be_code_deploy_bucket_arn = module.deployment_spring_prod.codedeploy_s3_bucket_arn
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -94,7 +94,7 @@ module "compute" {
       key_name                    = var.key_name
       security_group_ids          = [module.ec2_sg.security_group_id]
       associate_public_ip_address = true
-      iam_instance_profile        = null
+      iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
       use_eip                     = true
       user_data                   = file("../../modules/compute/scripts/bastion_userdata.sh")
     }
@@ -113,7 +113,7 @@ module "compute" {
     "database" = {
       ami                         = var.ami_id
       instance_type               = "t3.small"
-      subnet_id                   = module.network.private_subnet_ids[0]
+      subnet_id                   = module.network.private_subnet_ids[2]
       key_name                    = var.key_name
       security_group_ids          = [module.ec2_sg.security_group_id]
       associate_public_ip_address = false
