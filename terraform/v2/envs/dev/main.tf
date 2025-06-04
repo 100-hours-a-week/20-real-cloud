@@ -25,10 +25,12 @@ module "network" {
   name_prefix = local.name_prefix
 }
 
-module "iam" {
-  source = "../../modules/iam"
+# module "iam" {
+#   source = "../../modules/iam"
 
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
+#   static_bucket_arn = var.static_bucket_arn
+#   log_bucket_arn    = var.log_bucket_arn
 
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }
