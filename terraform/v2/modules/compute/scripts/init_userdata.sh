@@ -3,7 +3,7 @@ set -e
 
 # 1. Update & basic packages
 yum update -y
-yum install -y ruby wget unzip docker curl git amazon-cloudwatch-agent
+yum install -y ruby wget unzip docker curl git
 
 # 2. Start Docker
 systemctl start docker
@@ -18,12 +18,8 @@ chmod +x ./install
 systemctl start codedeploy-agent
 systemctl enable codedeploy-agent
 
-# 4. Start CloudWatch Agent (기본 설치, 설정은 이후 적용)
-systemctl start amazon-cloudwatch-agent
-systemctl enable amazon-cloudwatch-agent
-
 cd /home/ec2-user
 wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.38.0/opentelemetry-javaagent.jar -O otel-agent.jar
 
 # Done
-echo "✅ Setup complete: Docker + CodeDeploy Agent + CloudWatch Agent + SigNoz OTEL Agent"
+echo "✅ Setup complete: Docker + CodeDeploy Agent + SigNoz OTEL Agent"
