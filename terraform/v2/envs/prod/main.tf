@@ -113,7 +113,7 @@ module "compute" {
     "database" = {
       ami                         = var.ami_id
       instance_type               = "t3.small"
-      subnet_id                   = module.network.private_subnet_ids[0]
+      subnet_id                   = module.network.private_subnet_ids[2]
       key_name                    = var.key_name
       security_group_ids          = [module.ec2_sg.security_group_id]
       associate_public_ip_address = false
