@@ -40,11 +40,6 @@ variable "target_group_blue" {
   default     = ""
 }
 
-variable "listener_arn" {
-  description = "Load balancer listener ARN for production traffic"
-  type        = string
-}
-
 variable "auto_scaling_groups" {
   description = "List of Auto Scaling Groups for deployment"
   type        = list(string)

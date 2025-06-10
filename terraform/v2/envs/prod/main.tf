@@ -200,7 +200,6 @@ module "deployment_next_prod" {
   deployment_config_name = "CodeDeployDefault.AllAtOnce"
 
   auto_scaling_groups = ["${var.name_prefix}-front-blue-asg"]
-  listener_arn        = module.alb.listener_front_arn
   target_group_blue   = module.alb.tg_front_blue_name
 
   blue_green = true
@@ -220,9 +219,8 @@ module "deployment_spring_prod" {
   deployment_config_name = "CodeDeployDefault.AllAtOnce"
 
   auto_scaling_groups = ["${var.name_prefix}-back-blue-asg"]
-  listener_arn        = module.alb.listener_back_arn
   target_group_blue   = module.alb.tg_back_blue_name
-  
+
   blue_green = true
 
   depends_on = [module.compute]
