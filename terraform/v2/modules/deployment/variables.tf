@@ -14,6 +14,11 @@ variable "common_tags" {
   type        = map(string)
 }
 
+variable "blue_green" {
+  description = "Enable blue-green deployment"
+  type        = bool
+}
+
 variable "app_name" {
   description = "CodeDeploy application name"
   type        = string
@@ -32,6 +37,7 @@ variable "service_role_arn" {
 variable "target_group_blue" {
   description = "Name of the blue target group"
   type        = string
+  default     = ""
 }
 
 variable "listener_arn" {
@@ -42,6 +48,7 @@ variable "listener_arn" {
 variable "auto_scaling_groups" {
   description = "List of Auto Scaling Groups for deployment"
   type        = list(string)
+  default     = []
 }
 
 variable "deployment_config_name" {

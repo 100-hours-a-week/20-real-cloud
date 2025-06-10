@@ -203,6 +203,8 @@ module "deployment_next_prod" {
   listener_arn        = module.alb.listener_front_arn
   target_group_blue   = module.alb.tg_front_blue_name
 
+  blue_green = true
+
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
@@ -218,7 +220,9 @@ module "deployment_spring_prod" {
   auto_scaling_groups = ["${var.name_prefix}-back-blue-asg"]
   listener_arn        = module.alb.listener_back_arn
   target_group_blue   = module.alb.tg_back_blue_name
-
+  
+  blue_green = true
+  
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
