@@ -107,3 +107,35 @@ module "compute" {
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
+
+module "deployment_next_dev" {
+  source = "../../modules/deployment"
+
+  app_name               = "next"
+  deployment_group_name  = "next-dev-deployment-group"
+  service_role_arn       = module.iam.codedeploy_iam_role_arn
+  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+
+  blue_green = false
+
+  depends_on = [module.compute]
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+module "deployment_spring_dev" {
+  source = "../../modules/deployment"
+
+  app_name               = "spring"
+  deployment_group_name  = "spring-dev-deployment-group"
+  service_role_arn       = module.iam.codedeploy_iam_role_arn
+  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+
+  blue_green = false
+
+  depends_on = [module.compute]
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
