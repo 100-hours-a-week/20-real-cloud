@@ -205,6 +205,8 @@ module "deployment_next_prod" {
 
   blue_green = true
 
+  depends_on = [module.compute]
+
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
@@ -222,7 +224,9 @@ module "deployment_spring_prod" {
   target_group_blue   = module.alb.tg_back_blue_name
   
   blue_green = true
-  
+
+  depends_on = [module.compute]
+
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
