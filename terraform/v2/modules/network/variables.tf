@@ -1,18 +1,3 @@
-variable "is_infra_env" {
-  description = "In Infra environments this variable is true, in other environments this variable is false"
-  type        = bool
-}
-
-variable "vpc_id" {
-  description = "VPC ID to associate with subnet"
-  type        = string
-}
-
-variable "internet_gateway_id" {
-  description = "Internet Gateway ID to associate with route table"
-  type        = string
-}
-
 variable "vpc_cidr_block" {
   description = "VPC CIDR block to which EC2 instance belongs"
   type        = string
@@ -33,14 +18,19 @@ variable "availability_zones" {
   type        = list(string)
 }
 
-variable "create_nat_gateway" {
-  description = "Create NAT Gateway when this variable is true (In Dev Environment)"
-  type        = bool
+variable "public_subnet_environments" {
+  description = "Environment (dev/prod) for each public subnet"
+  type        = list(string)
 }
 
-variable "nat_gateway_id" {
-  description = "NAT Gateway ID to associate with route table"
-  type        = string
+variable "private_subnet_environments" {
+  description = "Environment (dev/prod) for each private subnet"
+  type        = list(string)
+}
+
+variable "private_subnet_names" {
+  description = "List of private subnet name labels"
+  type        = list(string)
 }
 
 # Tags
@@ -64,11 +54,8 @@ variable "az_name_map" {
   type = map(string)
   default = {
     "ap-northeast-2a" = "Azone"
+    "ap-northeast-2b" = "Bzone"
     "ap-northeast-2c" = "Czone"
   }
 }
 
-variable "private_subnet_names" {
-  description = "Private Subnet names"
-  type        = list(string)
-}

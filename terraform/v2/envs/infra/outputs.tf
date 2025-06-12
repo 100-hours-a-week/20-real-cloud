@@ -1,9 +1,11 @@
-output "vpc_id" {
-  description = "VPC ID"
-  value       = module.network.vpc_id
-}
 
-output "internet_gateway_id" {
-  description = "Internet Gateway ID belonging to VPC"
-  value       = module.network.internet_gateway_id
-}
+
+# output "public_zone_id" {
+#   description = "Public Route 53 Zone ID"
+#   value       = module.cdn.public_zone_id
+# }
+
+# output "private_zone_id" {
+#   description = "Private Route 53 Zone ID"
+#   value       = module.cdn.private_zone_id
+# }

@@ -1,5 +1,4 @@
 resource "aws_vpc" "this" {
-  count                = var.is_infra_env ? 1 : 0
   cidr_block           = var.vpc_cidr_block
   enable_dns_support   = true
   enable_dns_hostnames = true
@@ -12,9 +11,45 @@ resource "aws_vpc" "this" {
   )
 }
 
+resource "aws_eip" "nat" {
+  tags = merge(
+    local.default_tags,
+    {
+      Name = "${var.name_prefix}-nat-eip"
+    }
+  )
+}
+
+resource "aws_subnet" "public" {
+  count             = length(var.public_subnet_cidr_blocks)
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = var.public_subnet_cidr_blocks[count.index]
+  availability_zone = var.availability_zones[count.index]
+
+  tags = merge(
+    local.default_tags,
+    {
+      Name = "${var.name_prefix}-${var.public_subnet_environments[count.index]}-public-subnet-${var.az_name_map[var.availability_zones[count.index]]}"
+    }
+  )
+}
+
+resource "aws_subnet" "private" {
+  count             = length(var.private_subnet_cidr_blocks)
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = var.private_subnet_cidr_blocks[count.index]
+  availability_zone = var.availability_zones[count.index % length(var.availability_zones)]
+
+  tags = merge(
+    local.default_tags,
+    {
+      Name = "${var.name_prefix}-${var.private_subnet_environments[count.index]}-private-subnet-${var.private_subnet_names[count.index]}-${var.az_name_map[var.availability_zones[count.index % length(var.availability_zones)]]}"
+    }
+  )
+}
+
 resource "aws_internet_gateway" "this" {
-  count  = var.is_infra_env ? 1 : 0
-  vpc_id = local.selected_vpc_id
+  vpc_id = aws_vpc.this.id
 
   tags = merge(
     local.default_tags,
@@ -24,105 +59,106 @@ resource "aws_internet_gateway" "this" {
   )
 }
 
-resource "aws_subnet" "public" {
-  count             = var.is_infra_env ? 0 : length(var.public_subnet_cidr_blocks)
-  vpc_id            = local.selected_vpc_id
-  cidr_block        = var.public_subnet_cidr_blocks[count.index]
-  availability_zone = var.availability_zones[count.index]
-
-  tags = merge(
-    local.default_tags,
-    {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-public-subnet-${var.az_name_map[var.availability_zones[count.index]]}"
-    }
-  )
-}
-
-resource "aws_subnet" "private" {
-  count             = var.is_infra_env ? 0 : length(var.private_subnet_cidr_blocks)
-  vpc_id            = local.selected_vpc_id
-  cidr_block        = var.private_subnet_cidr_blocks[count.index]
-  availability_zone = var.availability_zones[count.index % length(var.availability_zones)]
-
-  tags = merge(
-    local.default_tags,
-    {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-private-subnet-${var.private_subnet_names[count.index]}-${var.az_name_map[var.availability_zones[count.index % length(var.availability_zones)]]}"
-    }
-  )
-}
-
 resource "aws_nat_gateway" "this" {
-  count = var.create_nat_gateway ? 1 : 0
-
-  allocation_id = aws_eip.nat[0].id
+  allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public[0].id
 
   tags = merge(
     local.default_tags,
     {
-      Name = "${var.name_prefix}-nat-gateway"
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-nat-gateway"
     }
   )
 }
 
-resource "aws_route_table" "public" {
-  count  = var.is_infra_env ? 0 : 1
-  vpc_id = local.selected_vpc_id
+resource "aws_route_table" "public_prod" {
+  vpc_id = aws_vpc.this.id
 
   tags = merge(
     local.default_tags,
     {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-public-route-table"
+      Name = "${var.name_prefix}-prod-public-route-table"
     }
   )
 }
 
-resource "aws_route" "public_internet_route" {
-  count                  = var.is_infra_env ? 0 : 1
-  route_table_id         = aws_route_table.public[0].id
+resource "aws_route_table" "public_dev" {
+  vpc_id = aws_vpc.this.id
+
+  tags = merge(
+    local.default_tags,
+    {
+      Name = "${var.name_prefix}-dev-public-route-table"
+    }
+  )
+}
+
+resource "aws_route" "public_internet_route_prod" {
+  route_table_id         = aws_route_table.public_prod.id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = local.selected_internet_gateway_id
+  gateway_id             = aws_internet_gateway.this.id
+}
+
+resource "aws_route" "public_internet_route_dev" {
+  route_table_id         = aws_route_table.public_dev.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.this.id
 }
 
 resource "aws_route_table_association" "public" {
-  count          = var.is_infra_env ? 0 : length(var.public_subnet_cidr_blocks)
-  subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public[0].id
+  for_each = {
+    for idx, subnet in aws_subnet.public :
+    idx => {
+      subnet_id   = subnet.id
+      environment = var.public_subnet_environments[idx]
+    }
+  }
+  subnet_id      = each.value.subnet_id
+  route_table_id = each.value.environment == "prod" ? aws_route_table.public_prod.id : aws_route_table.public_dev.id
 }
 
-resource "aws_route_table" "private" {
-  count  = var.is_infra_env ? 0 : 1
-  vpc_id = local.selected_vpc_id
+resource "aws_route_table" "private_prod" {
+  vpc_id = aws_vpc.this.id
 
   tags = merge(
     local.default_tags,
     {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-private-route-table"
+      Name = "${var.name_prefix}-prod-private-route-table"
     }
   )
 }
 
-resource "aws_route" "private_nat_route" {
-  count                  = var.is_infra_env ? 0 : 1
-  route_table_id         = aws_route_table.private[0].id
+resource "aws_route_table" "private_dev" {
+  vpc_id = aws_vpc.this.id
+
+  tags = merge(
+    local.default_tags,
+    {
+      Name = "${var.name_prefix}-dev-private-route-table"
+    }
+  )
+}
+
+resource "aws_route" "private_nat_route_prod" {
+  route_table_id         = aws_route_table.private_prod.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = local.selected_nat_gateway_id
+  nat_gateway_id         = aws_nat_gateway.this.id
+}
+
+resource "aws_route" "private_nat_route_dev" {
+  route_table_id         = aws_route_table.private_dev.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.this.id
 }
 
 resource "aws_route_table_association" "private" {
-  count          = var.is_infra_env ? 0 : length(var.private_subnet_cidr_blocks)
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private[0].id
-}
-
-resource "aws_eip" "nat" {
-  count = (var.is_infra_env == false && var.create_nat_gateway == true) ? 1 : 0
-
-  tags = merge(
-    local.default_tags,
-    {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-eip"
+  for_each = {
+    for idx, subnet in aws_subnet.private :
+    idx => {
+      subnet_id   = subnet.id
+      environment = var.private_subnet_environments[idx]
     }
-  )
+  }
+  subnet_id      = each.value.subnet_id
+  route_table_id = each.value.environment == "prod" ? aws_route_table.private_prod.id : aws_route_table.private_dev.id
 }

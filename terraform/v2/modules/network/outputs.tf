@@ -1,24 +1,37 @@
 output "vpc_id" {
-  description = "VPC ID"
-  value       = var.is_infra_env ? aws_vpc.this[0].id : null
+  value = aws_vpc.this.id
 }
 
 output "public_subnet_ids" {
-  description = "Public subnet ID in VPC"
-  value       = [for subnet in aws_subnet.public : subnet.id]
+  value = aws_subnet.public[*].id
 }
 
 output "private_subnet_ids" {
-  description = "Private subnet ID in VPC"
-  value       = [for subnet in aws_subnet.private : subnet.id]
-}
-
-output "nat_gateway_id" {
-  description = "NAT Gateway ID"
-  value       = var.create_nat_gateway ? aws_nat_gateway.this[0].id : var.nat_gateway_id
+  value = aws_subnet.private[*].id
 }
 
 output "internet_gateway_id" {
-  description = "Internet Gateway ID belonging to VPC"
-  value       = var.is_infra_env ? aws_internet_gateway.this[0].id : var.internet_gateway_id
+  value = aws_internet_gateway.this.id
+}
+
+output "nat_gateway_id" {
+  value = aws_nat_gateway.this.id
+}
+
+output "eip_id" {
+  value = aws_eip.nat.id
+}
+
+output "public_route_table_ids" {
+  value = {
+    dev  = aws_route_table.public_dev.id
+    prod = aws_route_table.public_prod.id
+  }
+}
+
+output "private_route_table_ids" {
+  value = {
+    dev  = aws_route_table.private_dev.id
+    prod = aws_route_table.private_prod.id
+  }
 }

@@ -1,27 +1,75 @@
 module "network" {
   source = "../../modules/network"
 
-  is_infra_env               = var.is_infra_env
-  internet_gateway_id        = var.internet_gateway_id
-  vpc_id                     = var.vpc_id
-  vpc_cidr_block             = var.vpc_cidr_block
-  public_subnet_cidr_blocks  = var.public_subnet_cidr_blocks
-  private_subnet_cidr_blocks = var.private_subnet_cidr_blocks
-  availability_zones         = var.availability_zones
-  private_subnet_names       = var.private_subnet_names
-  create_nat_gateway         = var.create_nat_gateway
-  nat_gateway_id             = var.nat_gateway_id
+  vpc_cidr_block              = var.vpc_cidr_block
+  public_subnet_cidr_blocks   = var.public_subnet_cidr_blocks
+  private_subnet_cidr_blocks  = var.private_subnet_cidr_blocks
+  availability_zones          = var.availability_zones
+  private_subnet_names        = var.private_subnet_names
+  public_subnet_environments  = var.public_subnet_environments
+  private_subnet_environments = var.private_subnet_environments
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
 
-module "ecr" {
-  source = "../../modules/registry"
+# module "ecr" {
+#   source = "../../modules/registry"
 
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }
+
+# module "alb_sg" {
+#   source = "../../modules/security_group"
+
+#   vpc_id = module.network.vpc_id
+
+#   ingress_rules = var.alb_ingress_rules
+#   egress_rules  = var.alb_egress_rules
+
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }
+
+# module "alb" {
+#   source = "../../modules/alb"
+
+#   subnet_ids          = [module.network.public_subnet_ids[0], module.network.public_subnet_ids[1]]
+#   security_group_id   = module.alb_sg.security_group_id
+#   certificate_arn     = var.ap_acm_certificate_arn
+#   target_group_vpc_id = module.network.vpc_id
+
+#   back_target_group_port  = 8080
+#   front_target_group_port = 3000
+
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }
+
+# module "storage" {
+#   source = "../../modules/storage"
+# }
+
+# module "cdn" {
+#   source = "../../modules/cdn"
+
+#   vpc_id = module.network.vpc_id
+#   alb_dns_name = var.alb_dns_name
+#   bucket_regional_domain_name = var.bucket_regional_domain_name
+#   acm_certificate_arn = var.us_acm_certificate_arn
+#   apex_domain_name = var.apex_domain_name
+#   hosted_zone_id = var.hosted_zone_id
+#   records = var.records
+
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }
+
+
+
+
+
 
 # module "codedeploy_next" {
 #   source                = "../../modules/codedeploy"
