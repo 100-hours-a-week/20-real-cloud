@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "codedeploy_bucket" {
 }
 
 resource "aws_codedeploy_app" "this" {
-  name             = "${var.name_prefix}-${var.app_name}-deployment"
+  name             = "${var.name_prefix}-${var.app_name}-${var.common_tags.Environment}-deployment"
   compute_platform = "Server"
 
   tags = merge(
@@ -29,33 +29,39 @@ resource "aws_codedeploy_deployment_group" "this" {
 
   autoscaling_groups = var.auto_scaling_groups
 
-  deployment_style {
-    deployment_option = "WITH_TRAFFIC_CONTROL"
-    deployment_type   = "BLUE_GREEN"
-  }
 
-  blue_green_deployment_config {
-    green_fleet_provisioning_option {
-      action = "COPY_AUTO_SCALING_GROUP"
-    }
-
-    deployment_ready_option {
-      action_on_timeout = "CONTINUE_DEPLOYMENT"
-    }
-
-
-    terminate_blue_instances_on_deployment_success {
-      action                           = "TERMINATE"
-      termination_wait_time_in_minutes = 60
+  dynamic "deployment_style" {
+    for_each = var.blue_green ? [1] : []
+    content {
+      deployment_option = "WITH_TRAFFIC_CONTROL"
+      deployment_type   = "BLUE_GREEN"
     }
   }
 
-  load_balancer_info {
+  dynamic "blue_green_deployment_config" {
+    for_each = var.blue_green ? [1] : []
+    content {
+      green_fleet_provisioning_option {
+        action = "COPY_AUTO_SCALING_GROUP"
+      }
 
-    target_group_info {
-      name = var.target_group_blue
+      deployment_ready_option {
+        action_on_timeout = "CONTINUE_DEPLOYMENT"
+      }
+      terminate_blue_instances_on_deployment_success {
+        action                           = "TERMINATE"
+        termination_wait_time_in_minutes = 60
+      }
     }
+  }
 
+  dynamic "load_balancer_info" {
+    for_each = var.blue_green ? [1] : []
+    content {
+      target_group_info {
+        name = var.target_group_blue
+      }
+    }
 
   }
 
