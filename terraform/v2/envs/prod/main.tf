@@ -16,24 +16,6 @@ data "terraform_remote_state" "dev" {
   }
 }
 
-module "network" {
-  source = "../../modules/network"
-
-  is_infra_env               = var.is_infra_env
-  vpc_id                     = data.terraform_remote_state.infra.outputs.vpc_id
-  internet_gateway_id        = data.terraform_remote_state.infra.outputs.internet_gateway_id
-  vpc_cidr_block             = var.vpc_cidr_block
-  public_subnet_cidr_blocks  = var.public_subnet_cidr_blocks
-  private_subnet_cidr_blocks = var.private_subnet_cidr_blocks
-  availability_zones         = var.availability_zones
-  private_subnet_names       = var.private_subnet_names
-  nat_gateway_id             = data.terraform_remote_state.dev.outputs.nat_gateway_id
-  create_nat_gateway         = var.create_nat_gateway
-
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
-
 module "iam" {
   source = "../../modules/iam"
 
@@ -46,6 +28,26 @@ module "iam" {
   name_prefix = local.name_prefix
 }
 
+module "alb_envs" {
+  source = "../../modules/alb_envs"
+
+  https_listener_arn                 = data.terraform_remote_state.infra.outputs.https_listener_arn
+  alb_arn                            = data.terraform_remote_state.infra.outputs.alb_arn
+  https_front_listener_rule_priority = var.https_front_listener_rule_priority
+  https_back_listener_rule_priority  = var.https_back_listener_rule_priority
+  https_ws_listener_rule_priority    = var.https_ws_listener_rule_priority
+  host_header_values                 = var.host_header_values
+  back_target_group_port             = var.back_target_group_port
+  front_target_group_port            = var.front_target_group_port
+  ws_target_group_port               = var.ws_target_group_port
+  metric_target_group_port           = var.metric_target_group_port
+  target_group_vpc_id                = data.terraform_remote_state.infra.outputs.vpc_id
+  certificate_arn                    = var.ap_acm_certificate_arn
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
 module "ec2_sg" {
   source = "../../modules/security_group"
 
@@ -53,18 +55,6 @@ module "ec2_sg" {
 
   ingress_rules = var.ec2_ingress_rules
   egress_rules  = var.ec2_egress_rules
-
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
-
-module "alb_sg" {
-  source = "../../modules/security_group"
-
-  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
-
-  ingress_rules = var.alb_ingress_rules
-  egress_rules  = var.alb_egress_rules
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -106,28 +96,13 @@ module "monitoring_sg" {
   name_prefix = "${local.name_prefix}-mon"
 }
 
-module "alb" {
-  source = "../../modules/alb"
-
-  subnet_ids          = [module.network.private_subnet_ids[0], module.network.private_subnet_ids[1]]
-  security_group_id   = module.alb_sg.security_group_id
-  certificate_arn     = var.ap_acm_certificate_arn
-  target_group_vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
-
-  back_target_group_port  = 8080
-  front_target_group_port = 80
-
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
-
 module "compute" {
   source = "../../modules/compute"
   ec2_instances = {
     "bastion" = {
       ami                         = var.ami_id
       instance_type               = "t3.micro"
-      subnet_id                   = module.network.public_subnet_ids[0]
+      subnet_id                   = data.terraform_remote_state.infra.outputs.public_subnet_ids[0]
       key_name                    = var.key_name
       security_group_ids          = [module.ec2_sg.security_group_id]
       associate_public_ip_address = true
@@ -138,7 +113,7 @@ module "compute" {
     "monitoring" = {
       ami                         = var.ami_id
       instance_type               = "t3.micro"
-      subnet_id                   = module.network.public_subnet_ids[0]
+      subnet_id                   = data.terraform_remote_state.infra.outputs.public_subnet_ids[0]
       key_name                    = var.key_name
       security_group_ids          = [module.monitoring_sg.security_group_id]
       associate_public_ip_address = true
@@ -150,7 +125,7 @@ module "compute" {
     "database" = {
       ami                         = var.ami_id
       instance_type               = "t3.small"
-      subnet_id                   = module.network.private_subnet_ids[2]
+      subnet_id                   = data.terraform_remote_state.infra.outputs.private_subnet_ids[3]
       key_name                    = var.key_name
       security_group_ids          = [module.database_sg.security_group_id]
       associate_public_ip_address = false
@@ -170,8 +145,8 @@ module "compute" {
       user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
       security_group_ids   = [module.application_sg.security_group_id]
       iam_instance_profile = module.iam.ec2_iam_instance_profile_name
-      alb_target_group_arn = module.alb.tg_front_blue_arn
-      subnet_id            = module.network.private_subnet_ids[0]
+      alb_target_group_arn = module.alb_envs.tg_front_blue_arn
+      subnet_id            = data.terraform_remote_state.infra.outputs.private_subnet_ids[0]
     }
 
     "back-blue" = {
@@ -181,11 +156,22 @@ module "compute" {
       user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
       security_group_ids   = [module.application_sg.security_group_id]
       iam_instance_profile = module.iam.ec2_iam_instance_profile_name
-      alb_target_group_arn = module.alb.tg_back_blue_arn
-      subnet_id            = module.network.private_subnet_ids[0]
+      alb_target_group_arn = module.alb_envs.tg_back_blue_arn
+      subnet_id            = data.terraform_remote_state.infra.outputs.private_subnet_ids[0]
     }
   }
 
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+module "route53_private" {
+  source = "../../modules/route53_private"
+
+  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
+  db_ec2_private_dns = module.compute.db_ec2_private_dns
+  apex_domain_name = var.apex_domain_name
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -200,7 +186,7 @@ module "deployment_next_prod" {
   deployment_config_name = "CodeDeployDefault.AllAtOnce"
 
   auto_scaling_groups = ["${var.name_prefix}-front-blue-asg"]
-  target_group_blue   = module.alb.tg_front_blue_name
+  target_group_blue   = module.alb_envs.tg_front_blue_name
 
   blue_green = true
 
@@ -219,7 +205,7 @@ module "deployment_spring_prod" {
   deployment_config_name = "CodeDeployDefault.AllAtOnce"
 
   auto_scaling_groups = ["${var.name_prefix}-back-blue-asg"]
-  target_group_blue   = module.alb.tg_back_blue_name
+  target_group_blue   = module.alb_envs.tg_back_blue_name
 
   blue_green = true
 

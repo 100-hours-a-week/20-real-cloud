@@ -13,88 +13,66 @@ module "network" {
   name_prefix = local.name_prefix
 }
 
-# module "ecr" {
-#   source = "../../modules/registry"
+module "alb_sg" {
+  source = "../../modules/security_group"
 
-#   common_tags = local.common_tags
-#   name_prefix = local.name_prefix
-# }
+  vpc_id = module.network.vpc_id
 
-# module "alb_sg" {
-#   source = "../../modules/security_group"
+  ingress_rules = var.alb_ingress_rules
+  egress_rules  = var.alb_egress_rules
 
-#   vpc_id = module.network.vpc_id
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
 
-#   ingress_rules = var.alb_ingress_rules
-#   egress_rules  = var.alb_egress_rules
+module "alb_infra" {
+  source = "../../modules/alb_infra"
 
-#   common_tags = local.common_tags
-#   name_prefix = local.name_prefix
-# }
+  subnet_ids        = [module.network.public_subnet_ids[0], module.network.public_subnet_ids[1], module.network.public_subnet_ids[2]]
+  security_group_id = module.alb_sg.security_group_id
+  target_group_vpc_id = module.network.vpc_id
+  certificate_arn     = var.ap_acm_certificate_arn
 
-# module "alb" {
-#   source = "../../modules/alb"
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
 
-#   subnet_ids          = [module.network.public_subnet_ids[0], module.network.public_subnet_ids[1]]
-#   security_group_id   = module.alb_sg.security_group_id
-#   certificate_arn     = var.ap_acm_certificate_arn
-#   target_group_vpc_id = module.network.vpc_id
+# module "stroage"
+# 이후에 S3 마이그레이션 시 추가 필요
 
-#   back_target_group_port  = 8080
-#   front_target_group_port = 3000
+module "cdn" {
+  source = "../../modules/cdn"
 
-#   common_tags = local.common_tags
-#   name_prefix = local.name_prefix
-# }
+  alb_dns_name                = module.alb_infra.alb_dns_name
+  bucket_regional_domain_name = var.bucket_regional_domain_name
+  acm_certificate_arn         = var.us_acm_certificate_arn
+  apex_domain_name            = var.apex_domain_name
 
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+module "route53_public" {
+  source = "../../modules/route53_public"
+
+  apex_domain_name       = var.apex_domain_name
+  alb_dns_name           = module.alb_infra.alb_dns_name
+  alb_zone_id            = module.alb_infra.alb_zone_id
+  cloudfront_domain_name = module.cdn.cloudfront_domain_name
+
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+module "ecr" {
+  source = "../../modules/registry"
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+// 이후에 S3 마이그레이션 시 추가 필요
 # module "storage" {
 #   source = "../../modules/storage"
-# }
-
-# module "cdn" {
-#   source = "../../modules/cdn"
-
-#   vpc_id = module.network.vpc_id
-#   alb_dns_name = var.alb_dns_name
-#   bucket_regional_domain_name = var.bucket_regional_domain_name
-#   acm_certificate_arn = var.us_acm_certificate_arn
-#   apex_domain_name = var.apex_domain_name
-#   hosted_zone_id = var.hosted_zone_id
-#   records = var.records
-
-#   common_tags = local.common_tags
-#   name_prefix = local.name_prefix
-# }
-
-
-
-
-
-
-# module "codedeploy_next" {
-#   source                = "../../modules/codedeploy"
-#   app_name              = "next"
-#   deployment_group_name = "next-bluegreen"
-#   service_role_arn      = aws_iam_role.codedeploy.arn
-#   target_group_blue     = aws_lb_target_group.next_blue.arn
-#   target_group_green    = aws_lb_target_group.next_green.arn
-#   listener_arn          = aws_lb_listener.frontend.arn
-#   auto_scaling_groups   = [aws_autoscaling_group.next_asg.name]
-
-#   common_tags = local.common_tags
-#   name_prefix = local.name_prefix
-# }
-
-# module "codedeploy_springboot" {
-#   source                = "../../modules/codedeploy"
-#   app_name              = "springboot"
-#   deployment_group_name = "springboot-bluegreen"
-#   service_role_arn      = aws_iam_role.codedeploy.arn
-#   target_group_blue     = aws_lb_target_group.spring_blue.arn
-#   target_group_green    = aws_lb_target_group.spring_green.arn
-#   listener_arn          = aws_lb_listener.frontend.arn
-#   auto_scaling_groups   = [aws_autoscaling_group.spring_asg.name]
-
-#   common_tags = local.common_tags
-#   name_prefix = local.name_prefix
 # }

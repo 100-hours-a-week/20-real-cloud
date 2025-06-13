@@ -7,24 +7,6 @@ data "terraform_remote_state" "infra" {
   }
 }
 
-module "network" {
-  source = "../../modules/network"
-
-  is_infra_env               = var.is_infra_env
-  vpc_id                     = data.terraform_remote_state.infra.outputs.vpc_id
-  internet_gateway_id        = data.terraform_remote_state.infra.outputs.internet_gateway_id
-  vpc_cidr_block             = var.vpc_cidr_block
-  public_subnet_cidr_blocks  = var.public_subnet_cidr_blocks
-  private_subnet_cidr_blocks = var.private_subnet_cidr_blocks
-  availability_zones         = var.availability_zones
-  private_subnet_names       = var.private_subnet_names
-  create_nat_gateway         = var.create_nat_gateway
-  nat_gateway_id             = var.nat_gateway_id
-
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
-
 module "iam" {
   source = "../../modules/iam"
 
@@ -36,6 +18,27 @@ module "iam" {
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
+
+module "alb_envs" {
+  source = "../../modules/alb_envs"
+
+  https_listener_arn                 = data.terraform_remote_state.infra.outputs.https_listener_arn
+  alb_arn                            = data.terraform_remote_state.infra.outputs.alb_arn
+  https_front_listener_rule_priority = var.https_front_listener_rule_priority
+  https_back_listener_rule_priority  = var.https_back_listener_rule_priority
+  https_ws_listener_rule_priority    = var.https_ws_listener_rule_priority
+  host_header_values                 = var.host_header_values
+  back_target_group_port             = var.back_target_group_port
+  front_target_group_port            = var.front_target_group_port
+  ws_target_group_port               = var.ws_target_group_port
+  metric_target_group_port           = var.metric_target_group_port
+  target_group_vpc_id                = data.terraform_remote_state.infra.outputs.vpc_id
+  certificate_arn                    = var.ap_acm_certificate_arn
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
 module "ec2_sg" {
   source = "../../modules/security_group"
 
@@ -79,7 +82,7 @@ module "compute" {
     "application" = {
       ami                         = var.ami_id
       instance_type               = "t3.small"
-      subnet_id                   = module.network.private_subnet_ids[0]
+      subnet_id                   = data.terraform_remote_state.infra.outputs.private_subnet_ids[2]
       key_name                    = var.key_name
       security_group_ids          = [module.sg_application.security_group_id]
       associate_public_ip_address = false
@@ -90,7 +93,7 @@ module "compute" {
     "database" = {
       ami                         = var.ami_id
       instance_type               = "t3.small"
-      subnet_id                   = module.network.private_subnet_ids[1]
+      subnet_id                   = data.terraform_remote_state.infra.outputs.private_subnet_ids[5]
       key_name                    = var.key_name
       security_group_ids          = [module.sg_database.security_group_id]
       associate_public_ip_address = false
@@ -103,6 +106,17 @@ module "compute" {
 
   # ASG + Launch Template 정의
   lanch_templates = {}
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+module "route53_private" {
+  source = "../../modules/route53_private"
+
+  vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
+  db_ec2_private_dns = module.compute.db_ec2_private_dns
+  apex_domain_name = var.apex_domain_name
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
