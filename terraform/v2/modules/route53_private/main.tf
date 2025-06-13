@@ -17,5 +17,5 @@ resource "aws_route53_record" "record" {
   name    = "db-${var.common_tags.Environment}.internal.${var.apex_domain_name}"
   type    = "CNAME"
   ttl     = 300
-  records = [var.database_instance.private_dns]
+  records = [var.db_ec2_private_dns]
 }

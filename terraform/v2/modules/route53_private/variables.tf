@@ -3,8 +3,8 @@ variable "apex_domain_name" {
   type        = string
 }
 
-variable "database_instance" {
-  description = "The database instance"
+variable "db_ec2_private_dns" {
+  description = "The database instance private DNS"
   type        = string
 }
 
