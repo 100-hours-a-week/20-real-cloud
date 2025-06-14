@@ -88,7 +88,7 @@ module "compute" {
       user_data                   = file("../../modules/compute/scripts/init_userdata.sh")
     }
     "database" = {
-      ami                         = var.ami_id
+      ami                         = var.db_ami_id
       instance_type               = "t3.small"
       subnet_id                   = module.network.private_subnet_ids[1]
       key_name                    = var.key_name
