@@ -112,7 +112,7 @@ module "compute" {
     }
     "monitoring" = {
       ami                         = var.monitoring_ami_id
-      instance_type               = "t3.micro"
+      instance_type               = "t3.small"
       subnet_id                   = data.terraform_remote_state.infra.outputs.public_subnet_ids[0]
       key_name                    = var.key_name
       security_group_ids          = [module.monitoring_sg.security_group_id]
