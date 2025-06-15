@@ -111,7 +111,7 @@ module "compute" {
       user_data                   = file("../../modules/compute/scripts/bastion_userdata.sh")
     }
     "monitoring" = {
-      ami                         = var.ami_id
+      ami                         = var.monitoring_ami_id
       instance_type               = "t3.micro"
       subnet_id                   = data.terraform_remote_state.infra.outputs.public_subnet_ids[0]
       key_name                    = var.key_name
@@ -119,11 +119,11 @@ module "compute" {
       associate_public_ip_address = true
       iam_instance_profile        = null
       use_eip                     = true
-      user_data                   = file("../../modules/compute/scripts/monitoring_userdata.sh")
+      user_data                   = null
     }
 
     "database" = {
-      ami                         = var.ami_id
+      ami                         = var.db_ami_id
       instance_type               = "t3.small"
       subnet_id                   = data.terraform_remote_state.infra.outputs.private_subnet_ids[3]
       key_name                    = var.key_name
