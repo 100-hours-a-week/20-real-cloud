@@ -13,6 +13,11 @@ systemctl start mysql
 systemctl enable redis-server
 systemctl start redis-server
 
+# Redis 설정
+sed -i 's/bind 127.0.0.1/bind 0.0.0.0/g' /etc/redis/redis.conf
+sed -i 's/daemonize no/daemonize yes/g' /etc/redis/redis.conf
+systemctl restart redis-server
+
 # 3. 비밀번호 SSM에서 가져오기
 MYSQL_ROOT_PASSWORD=$(aws ssm get-parameter --region ap-northeast-2 --name "/config/prod/db_passwd" --with-decryption --query "Parameter.Value" --output text)
 DB_USERNAME=$(aws ssm get-parameter --region ap-northeast-2 --name "/config/prod/db_user" --with-decryption --query "Parameter.Value" --output text)
