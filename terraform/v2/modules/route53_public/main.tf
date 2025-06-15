@@ -68,3 +68,21 @@ resource "aws_route53_record" "monitor_record" {
     evaluate_target_health = true
   }
 }
+
+resource "aws_route53_record" "ai_record" {
+  zone_id = aws_route53_zone.public.zone_id
+  name    = "ai.${var.apex_domain_name}"
+  type    = "A"
+
+  records = [var.ai_ip_address]
+  ttl     = 300
+}
+
+resource "aws_route53_record" "acm_record" {
+  zone_id = aws_route53_zone.public.zone_id
+  name    = "${var.acm_cname_name}.${var.apex_domain_name}"
+  type    = "CNAME"
+
+  records = [var.acm_cname_value]
+  ttl     = 300
+}

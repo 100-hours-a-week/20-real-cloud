@@ -7,15 +7,6 @@ data "terraform_remote_state" "infra" {
   }
 }
 
-data "terraform_remote_state" "dev" {
-  backend = "s3"
-  config = {
-    bucket = "ktb-20-terraform-backend-v2"
-    key    = "envs/dev/terraform.tfstate"
-    region = "ap-northeast-2"
-  }
-}
-
 module "iam" {
   source = "../../modules/iam"
 

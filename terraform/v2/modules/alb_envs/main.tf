@@ -104,8 +104,14 @@ resource "aws_lb_listener_rule" "https_ws_rule" {
     path_pattern {
       values = ["/ws/*"]
     }
-    host_header {
-      values = var.host_header_values.ws
+  }
+
+  dynamic "condition" {
+    for_each = length(var.host_header_values.ws) > 0 ? [1] : []
+    content {
+      host_header {
+        values = var.host_header_values.ws
+      }
     }
   }
 
@@ -130,6 +136,9 @@ resource "aws_lb_listener_rule" "https_front_rule" {
     path_pattern {
       values = ["/*"]
     }
+  }
+  
+  condition {
     host_header {
       values = var.host_header_values.front
     }
@@ -156,8 +165,18 @@ resource "aws_lb_listener_rule" "https_back_rule" {
     path_pattern {
       values = ["/api/*"]
     }
+  }
+
+  condition {
     host_header {
       values = var.host_header_values.back
     }
   }
+
+    tags = merge(
+    local.default_tags,
+    {
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-https-back-listener-rule"
+    }
+  )
 }

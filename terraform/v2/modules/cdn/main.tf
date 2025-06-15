@@ -1,11 +1,3 @@
-# modules/cloudfront/main.tf
-resource "aws_cloudfront_origin_access_control" "static_oac" {
-  name                              = "${var.name_prefix}-static-oac"
-  origin_access_control_origin_type = "s3"
-  signing_behavior                  = "always"
-  signing_protocol                  = "sigv4"
-}
-
 resource "aws_cloudfront_distribution" "this" {
   enabled         = true
   is_ipv6_enabled = true
@@ -40,7 +32,7 @@ resource "aws_cloudfront_distribution" "this" {
   origin {
     origin_id                = "s3-origin"
     domain_name              = var.bucket_regional_domain_name
-    origin_access_control_id = aws_cloudfront_origin_access_control.static_oac.id
+    origin_access_control_id = var.oac_id
   }
 
   # ALB Origin (for backend)
@@ -78,7 +70,7 @@ resource "aws_cloudfront_distribution" "this" {
 
   ordered_cache_behavior {
     path_pattern           = "/static/*"
-    target_origin_id       = "s3_origin"
+    target_origin_id       = "s3-origin"
     viewer_protocol_policy = "redirect-to-https"
 
     allowed_methods = ["GET", "HEAD"]
@@ -108,13 +100,6 @@ resource "aws_cloudfront_distribution" "this" {
     
     compress = true
 
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
-
     cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6" 
   }
 
@@ -128,13 +113,6 @@ resource "aws_cloudfront_distribution" "this" {
     
     compress = true
 
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
-
     cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6" 
   }
 
@@ -147,13 +125,6 @@ resource "aws_cloudfront_distribution" "this" {
     cached_methods  = ["GET", "HEAD"]
     
     compress = true
-
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
 
     cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6" 
   }

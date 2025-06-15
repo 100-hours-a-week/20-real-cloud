@@ -82,7 +82,7 @@ module "compute" {
     "application" = {
       ami                         = var.ami_id
       instance_type               = "t3.small"
-      subnet_id                   = data.terraform_remote_state.infra.outputs.private_subnet_ids[2]
+      subnet_id                   = data.terraform_remote_state.infra.outputs.private_subnet_ids[3]
       key_name                    = var.key_name
       security_group_ids          = [module.sg_application.security_group_id]
       associate_public_ip_address = false
@@ -93,7 +93,7 @@ module "compute" {
     "database" = {
       ami                         = var.db_ami_id
       instance_type               = "t3.small"
-      subnet_id                   = data.terraform_remote_state.infra.outputs.private_subnet_ids[5]
+      subnet_id                   = data.terraform_remote_state.infra.outputs.private_subnet_ids[0]
       key_name                    = var.key_name
       security_group_ids          = [module.sg_database.security_group_id]
       associate_public_ip_address = false

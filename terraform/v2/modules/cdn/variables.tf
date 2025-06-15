@@ -18,6 +18,11 @@ variable "alb_dns_name" {
   type        = string
 }
 
+variable "oac_id" {
+  description = "The ID of the OAC"
+  type        = string
+}
+
 #tag용 변수
 variable "module_name" {
   description = "Module name used for Module tag"

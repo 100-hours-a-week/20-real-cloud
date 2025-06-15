@@ -54,6 +54,16 @@ variable "ami_id" {
   type        = string
 }
 
+variable "db_ami_id" {
+  description = "The AMI ID for the database instance."
+  type        = string
+}
+
+variable "monitoring_ami_id" {
+  description = "The AMI ID for the monitoring instance."
+  type        = string
+}
+
 variable "key_name" {
   description = "The key pair name to use for SSH access."
   type        = string

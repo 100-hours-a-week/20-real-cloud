@@ -79,6 +79,26 @@ variable "bucket_regional_domain_name" {
   type        = string
 }
 
+variable "oac_id" {
+  description = "The ID of the OAC"
+  type        = string
+}
+
+variable "ai_ip_address" {
+  description = "The IP address of the AI"
+  type        = string
+}
+
+variable "acm_cname_name" {
+  description = "The name of the ACM CNAME record"
+  type        = string
+}
+
+variable "acm_cname_value" {
+  description = "The value of the ACM CNAME record"
+  type        = string
+}
+
 # Tags
 variable "name_prefix" {
   description = "Name tag's prefix"

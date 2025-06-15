@@ -18,6 +18,21 @@ variable "alb_zone_id" {
   type        = string
 }
 
+variable "ai_ip_address" {
+  description = "The IP address of the AI"
+  type        = string
+}
+
+variable "acm_cname_name" {
+  description = "The name of the ACM CNAME record"
+  type        = string
+}
+
+variable "acm_cname_value" {
+  description = "The value of the ACM CNAME record"
+  type        = string
+}
+
 #tag용 변수
 variable "module_name" {
   description = "Module name used for Module tag"
