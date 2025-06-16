@@ -53,6 +53,11 @@ variable "https_back_listener_rule_priority" {
   type        = number
 }
 
+variable "https_metric_listener_rule_priority" {
+  description = "priority of metric listener rule"
+  type        = number
+}
+
 variable "host_header_values" {
   description = "호스트 헤더 값들 (dev/prod 환경별로 다름)"
   type = object({

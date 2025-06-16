@@ -180,3 +180,26 @@ resource "aws_lb_listener_rule" "https_back_rule" {
     }
   )
 }
+
+resource "aws_lb_listener_rule" "https_metric_rule" {
+  listener_arn = var.https_listener_arn
+  priority     = var.https_metric_listener_rule_priority 
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.metric.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/monitoring-${var.common_tags.Environment}/*"]
+    }
+  }
+  
+  tags = merge(
+    local.default_tags,
+    {
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-https-metric-listener-rule"
+    }
+  )
+}
