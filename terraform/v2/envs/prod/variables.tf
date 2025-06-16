@@ -14,6 +14,11 @@ variable "https_ws_listener_rule_priority" {
   type        = number
 }
 
+variable "http_metric_listener_rule_priority" {
+  description = "priority of metric listener rule"
+  type        = number
+}
+
 variable "host_header_values" {
   description = "host header values (dev/prod environment)"
   type = object({
@@ -72,6 +77,16 @@ variable "key_name" {
 # Route53
 variable "apex_domain_name" {
   description = "The Apex domain name to associate with the CloudFront distribution"
+  type        = string
+}
+
+variable "private_zone_id" {
+  description = "The Private Route 53 Zone ID"
+  type        = string
+}
+
+variable "db_ec2_private_dns_name" {
+  description = "The Private DNS name of the DB EC2 instance"
   type        = string
 }
 
@@ -209,5 +224,16 @@ variable "static_bucket_arn" {
 }
 variable "log_bucket_arn" {
   description = "ARN of the S3 bucket for log files"
+  type        = string
+}
+
+#codedeploy
+variable "next_prod_code_deploy_bucket_arn" {
+  description = "ARN of the S3 bucket for next prod code deploy"
+  type        = string
+}
+
+variable "spring_prod_code_deploy_bucket_arn" {
+  description = "ARN of the S3 bucket for spring prod code deploy"
   type        = string
 }

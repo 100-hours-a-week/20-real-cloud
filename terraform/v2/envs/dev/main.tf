@@ -22,18 +22,20 @@ module "iam" {
 module "alb_envs" {
   source = "../../modules/alb_envs"
 
-  https_listener_arn                 = data.terraform_remote_state.infra.outputs.https_listener_arn
-  alb_arn                            = data.terraform_remote_state.infra.outputs.alb_arn
-  https_front_listener_rule_priority = var.https_front_listener_rule_priority
-  https_back_listener_rule_priority  = var.https_back_listener_rule_priority
-  https_ws_listener_rule_priority    = var.https_ws_listener_rule_priority
-  host_header_values                 = var.host_header_values
-  back_target_group_port             = var.back_target_group_port
-  front_target_group_port            = var.front_target_group_port
-  ws_target_group_port               = var.ws_target_group_port
-  metric_target_group_port           = var.metric_target_group_port
-  target_group_vpc_id                = data.terraform_remote_state.infra.outputs.vpc_id
-  certificate_arn                    = var.ap_acm_certificate_arn
+  https_listener_arn                  = data.terraform_remote_state.infra.outputs.https_listener_arn
+  http_listener_arn                   = data.terraform_remote_state.infra.outputs.http_listener_arn
+  alb_arn                             = data.terraform_remote_state.infra.outputs.alb_arn
+  https_front_listener_rule_priority  = var.https_front_listener_rule_priority
+  https_back_listener_rule_priority   = var.https_back_listener_rule_priority
+  https_ws_listener_rule_priority     = var.https_ws_listener_rule_priority
+  http_metric_listener_rule_priority  = var.http_metric_listener_rule_priority
+  host_header_values                  = var.host_header_values
+  back_target_group_port              = var.back_target_group_port
+  front_target_group_port             = var.front_target_group_port
+  ws_target_group_port                = var.ws_target_group_port
+  metric_target_group_port            = var.metric_target_group_port
+  target_group_vpc_id                 = data.terraform_remote_state.infra.outputs.vpc_id
+  certificate_arn                     = var.ap_acm_certificate_arn
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -117,39 +119,40 @@ module "route53_private" {
   vpc_id = data.terraform_remote_state.infra.outputs.vpc_id
   db_ec2_private_dns = module.compute.db_ec2_private_dns
   apex_domain_name = var.apex_domain_name
+  private_zone_id  = var.private_zone_id
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
 
-module "deployment_next_dev" {
-  source = "../../modules/deployment"
+# module "deployment_next_dev" {
+#   source = "../../modules/deployment"
 
-  app_name               = "next"
-  deployment_group_name  = "next-dev-deployment-group"
-  service_role_arn       = module.iam.codedeploy_iam_role_arn
-  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+#   app_name               = "next"
+#   deployment_group_name  = "next-dev-deployment-group"
+#   service_role_arn       = module.iam.codedeploy_iam_role_arn
+#   deployment_config_name = "CodeDeployDefault.AllAtOnce"
 
-  blue_green = false
+#   blue_green = false
 
-  depends_on = [module.compute]
+#   depends_on = [module.compute]
 
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }
 
-module "deployment_spring_dev" {
-  source = "../../modules/deployment"
+# module "deployment_spring_dev" {
+#   source = "../../modules/deployment"
 
-  app_name               = "spring"
-  deployment_group_name  = "spring-dev-deployment-group"
-  service_role_arn       = module.iam.codedeploy_iam_role_arn
-  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+#   app_name               = "spring"
+#   deployment_group_name  = "spring-dev-deployment-group"
+#   service_role_arn       = module.iam.codedeploy_iam_role_arn
+#   deployment_config_name = "CodeDeployDefault.AllAtOnce"
 
-  blue_green = false
+#   blue_green = false
 
-  depends_on = [module.compute]
+#   depends_on = [module.compute]
 
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }

@@ -13,6 +13,11 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "private_zone_id" {
+  description = "The Private Route 53 Zone ID"
+  type        = string
+}
+
 #tag용 변수
 variable "module_name" {
   description = "Module name used for Module tag"

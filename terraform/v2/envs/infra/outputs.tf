@@ -18,12 +18,17 @@ output "private_subnet_ids" {
   value       = module.network.private_subnet_ids
 }
 
-output "public_zone_id" {
-  description = "Public Route 53 Zone ID"
-  value       = module.route53_public.public_zone_id
-}
+# output "public_zone_id" {
+#   description = "Public Route 53 Zone ID"
+#   value       = module.route53_public.public_zone_id
+# }
 
 output "https_listener_arn" {
   description = "HTTPS Listener ARN"
   value       = module.alb_infra.https_listener_arn
+}
+
+output "http_listener_arn" {
+  description = "HTTP Listener ARN"
+  value       = module.alb_infra.http_listener_arn
 }

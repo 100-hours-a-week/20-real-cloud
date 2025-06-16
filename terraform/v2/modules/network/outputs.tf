@@ -15,11 +15,11 @@ output "internet_gateway_id" {
 }
 
 output "nat_gateway_id" {
-  value = aws_nat_gateway.this.id
+  value = var.enable_natgw ? aws_nat_gateway.this[0].id : null
 }
 
 output "eip_id" {
-  value = aws_eip.nat.id
+  value = var.enable_natgw ? aws_eip.nat[0].id : null
 }
 
 output "public_route_table_ids" {

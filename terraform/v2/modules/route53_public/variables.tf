@@ -18,6 +18,11 @@ variable "alb_zone_id" {
   type        = string
 }
 
+variable "public_zone_id" {
+  description = "The zone ID of the ALB"
+  type        = string
+}
+
 variable "ai_ip_address" {
   description = "The IP address of the AI"
   type        = string

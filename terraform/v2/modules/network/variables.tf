@@ -33,6 +33,11 @@ variable "private_subnet_names" {
   type        = list(string)
 }
 
+variable "enable_natgw" {
+  description = "Enable NAT Gateway"
+  type        = bool
+}
+
 # Tags
 variable "module_name" {
   description = "Module name used for Module tag"

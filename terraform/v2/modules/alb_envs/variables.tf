@@ -38,6 +38,11 @@ variable "https_listener_arn" {
   type        = string
 }
 
+variable "http_listener_arn" {
+  description = "HTTP 리스너 ARN"
+  type        = string
+}
+
 variable "https_ws_listener_rule_priority" {
   description = "priority of websocket listener rule"
   type        = number
@@ -53,7 +58,7 @@ variable "https_back_listener_rule_priority" {
   type        = number
 }
 
-variable "https_metric_listener_rule_priority" {
+variable "http_metric_listener_rule_priority" {
   description = "priority of metric listener rule"
   type        = number
 }

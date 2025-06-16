@@ -99,6 +99,16 @@ variable "acm_cname_value" {
   type        = string
 }
 
+variable "public_zone_id" {
+  description = "The zone ID of the ALB"
+  type        = string
+}
+
+variable "enable_natgw" {
+  description = "Enable NAT Gateway"
+  type        = bool
+}
+
 # Tags
 variable "name_prefix" {
   description = "Name tag's prefix"
@@ -128,4 +138,3 @@ variable "assignee_tag" {
   description = "Write down Assignee Tag"
   type        = string
 }
-

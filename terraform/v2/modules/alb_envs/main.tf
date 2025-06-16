@@ -181,9 +181,9 @@ resource "aws_lb_listener_rule" "https_back_rule" {
   )
 }
 
-resource "aws_lb_listener_rule" "https_metric_rule" {
-  listener_arn = var.https_listener_arn
-  priority     = var.https_metric_listener_rule_priority 
+resource "aws_lb_listener_rule" "http_metric_rule" {
+  listener_arn = var.http_listener_arn
+  priority     = var.http_metric_listener_rule_priority 
 
   action {
     type             = "forward"
@@ -199,7 +199,7 @@ resource "aws_lb_listener_rule" "https_metric_rule" {
   tags = merge(
     local.default_tags,
     {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-https-metric-listener-rule"
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-http-metric-listener-rule"
     }
   )
 }

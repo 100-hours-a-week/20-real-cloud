@@ -8,6 +8,7 @@ module "network" {
   private_subnet_names        = var.private_subnet_names
   public_subnet_environments  = var.public_subnet_environments
   private_subnet_environments = var.private_subnet_environments
+  enable_natgw                = var.enable_natgw
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
@@ -28,8 +29,8 @@ module "alb_sg" {
 module "alb_infra" {
   source = "../../modules/alb_infra"
 
-  subnet_ids        = [module.network.public_subnet_ids[0], module.network.public_subnet_ids[1], module.network.public_subnet_ids[2]]
-  security_group_id = module.alb_sg.security_group_id
+  subnet_ids          = [module.network.public_subnet_ids[0], module.network.public_subnet_ids[1], module.network.public_subnet_ids[2]]
+  security_group_id   = module.alb_sg.security_group_id
   target_group_vpc_id = module.network.vpc_id
   certificate_arn     = var.ap_acm_certificate_arn
 
@@ -56,6 +57,7 @@ module "route53_public" {
   apex_domain_name       = var.apex_domain_name
   alb_dns_name           = module.alb_infra.alb_dns_name
   alb_zone_id            = module.alb_infra.alb_zone_id
+  public_zone_id         = var.public_zone_id
   cloudfront_domain_name = module.cdn.cloudfront_domain_name
   ai_ip_address          = var.ai_ip_address
   acm_cname_name         = var.acm_cname_name

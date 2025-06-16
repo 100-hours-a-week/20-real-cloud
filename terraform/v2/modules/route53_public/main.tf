@@ -1,16 +1,5 @@
-resource "aws_route53_zone" "public" {
-  name  = var.apex_domain_name
-
-  tags = merge(
-    local.default_tags,
-    {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-route53-public-zone"
-    }
-  )
-}
-
 resource "aws_route53_record" "www_record" {
-  zone_id = aws_route53_zone.public.zone_id
+  zone_id = var.public_zone_id
   name    = "www.${var.apex_domain_name}"
   type    = "A"
 
@@ -22,7 +11,7 @@ resource "aws_route53_record" "www_record" {
 }
 
 resource "aws_route53_record" "api_record" {
-  zone_id = aws_route53_zone.public.zone_id
+  zone_id = var.public_zone_id
   name    = "api.${var.apex_domain_name}"
   type    = "A"
 
@@ -34,7 +23,7 @@ resource "aws_route53_record" "api_record" {
 }
 
 resource "aws_route53_record" "cadev_record" {
-  zone_id = aws_route53_zone.public.zone_id
+  zone_id = var.public_zone_id
   name    = "cadev.${var.apex_domain_name}"
   type    = "A"
 
@@ -46,7 +35,7 @@ resource "aws_route53_record" "cadev_record" {
 }
 
 resource "aws_route53_record" "collector_record" {
-  zone_id = aws_route53_zone.public.zone_id
+  zone_id = var.public_zone_id
   name    = "collector.${var.apex_domain_name}"
   type    = "A"
 
@@ -57,8 +46,8 @@ resource "aws_route53_record" "collector_record" {
   }
 }
 
-resource "aws_route53_record" "monitor_record" {
-  zone_id = aws_route53_zone.public.zone_id
+resource "aws_route53_record" "monitor_record" {  
+  zone_id = var.public_zone_id
   name    = "monitor.${var.apex_domain_name}"
   type    = "A"
 
@@ -70,16 +59,16 @@ resource "aws_route53_record" "monitor_record" {
 }
 
 resource "aws_route53_record" "ai_record" {
-  zone_id = aws_route53_zone.public.zone_id
+  zone_id = var.public_zone_id
   name    = "ai.${var.apex_domain_name}"
   type    = "A"
 
   records = [var.ai_ip_address]
-  ttl     = 300
+  ttl     = 60
 }
 
 resource "aws_route53_record" "acm_record" {
-  zone_id = aws_route53_zone.public.zone_id
+  zone_id = var.public_zone_id
   name    = "${var.acm_cname_name}.${var.apex_domain_name}"
   type    = "CNAME"
 

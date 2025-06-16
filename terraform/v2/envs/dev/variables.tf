@@ -14,6 +14,11 @@ variable "https_ws_listener_rule_priority" {
   type        = number
 }
 
+variable "http_metric_listener_rule_priority" {
+  description = "priority of metric listener rule"
+  type        = number
+}
+
 variable "back_target_group_port" {
   description = "port number of backend target group"
   type        = number
@@ -49,6 +54,11 @@ variable "ap_acm_certificate_arn" {
 
 variable "apex_domain_name" {
   description = "The Apex domain name to associate with the CloudFront distribution"
+  type        = string
+}
+
+variable "private_zone_id" {
+  description = "The Private Route 53 Zone ID"
   type        = string
 }
 
