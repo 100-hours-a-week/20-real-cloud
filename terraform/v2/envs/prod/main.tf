@@ -89,75 +89,75 @@ module "monitoring_sg" {
   name_prefix = "${local.name_prefix}-mon"
 }
 
-# module "compute" {
-#   source = "../../modules/compute"
-#   ec2_instances = {
-#     "bastion" = {
-#       ami                         = var.ami_id
-#       instance_type               = "t3.micro"
-#       subnet_id                   = data.terraform_remote_state.infra.outputs.public_subnet_ids[0]
-#       key_name                    = var.key_name
-#       security_group_ids          = [module.ec2_sg.security_group_id]
-#       associate_public_ip_address = true
-#       iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
-#       use_eip                     = true
-#       user_data                   = file("../../modules/compute/scripts/bastion_userdata.sh")
-#     }
-#     "monitoring" = {
-#       ami                         = var.monitoring_ami_id
-#       instance_type               = "t3.small"
-#       subnet_id                   = data.terraform_remote_state.infra.outputs.public_subnet_ids[0]
-#       key_name                    = var.key_name
-#       security_group_ids          = [module.monitoring_sg.security_group_id]
-#       associate_public_ip_address = true
-#       iam_instance_profile        = null
-#       use_eip                     = true
-#       user_data                   = null
-#     }
+module "compute" {
+  source = "../../modules/compute"
+  ec2_instances = {
+    # "bastion" = {
+    #   ami                         = var.ami_id
+    #   instance_type               = "t3.micro"
+    #   subnet_id                   = data.terraform_remote_state.infra.outputs.public_subnet_ids[0]
+    #   key_name                    = var.key_name
+    #   security_group_ids          = [module.ec2_sg.security_group_id]
+    #   associate_public_ip_address = true
+    #   iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
+    #   use_eip                     = true
+    #   user_data                   = file("../../modules/compute/scripts/bastion_userdata.sh")
+    # }
+    # "monitoring" = {
+    #   ami                         = var.monitoring_ami_id
+    #   instance_type               = "t3.small"
+    #   subnet_id                   = data.terraform_remote_state.infra.outputs.public_subnet_ids[0]
+    #   key_name                    = var.key_name
+    #   security_group_ids          = [module.monitoring_sg.security_group_id]
+    #   associate_public_ip_address = true
+    #   iam_instance_profile        = null
+    #   use_eip                     = true
+    #   user_data                   = null
+    # }
 
-#     "database" = {
-#       ami                         = var.db_ami_id
-#       instance_type               = "t3.small"
-#       subnet_id                   = data.terraform_remote_state.infra.outputs.private_subnet_ids[3]
-#       key_name                    = var.key_name
-#       security_group_ids          = [module.database_sg.security_group_id]
-#       associate_public_ip_address = false
-#       iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
-#       use_eip                     = false
-#       user_data                   = file("../../modules/compute/scripts/db_userdata.sh")
-#     }
+    # "database" = {
+    #   ami                         = var.db_ami_id
+    #   instance_type               = "t3.small"
+    #   subnet_id                   = data.terraform_remote_state.infra.outputs.private_subnet_ids[3]
+    #   key_name                    = var.key_name
+    #   security_group_ids          = [module.database_sg.security_group_id]
+    #   associate_public_ip_address = false
+    #   iam_instance_profile        = module.iam.ssm_iam_instance_profile_name
+    #   use_eip                     = false
+    #   user_data                   = file("../../modules/compute/scripts/db_userdata.sh")
+    # }
 
-#   }
+  }
 
-#   # ASG + Launch Template 정의
-#   lanch_templates = {
-#     "front-blue" = {
-#       ami                  = var.ami_id
-#       instance_type        = "t3.small"
-#       key_name             = var.key_name
-#       user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
-#       security_group_ids   = [module.application_sg.security_group_id]
-#       iam_instance_profile = module.iam.ec2_iam_instance_profile_name
-#       alb_target_group_arn = module.alb_envs.tg_front_blue_arn
-#       subnet_id            = data.terraform_remote_state.infra.outputs.private_subnet_ids[0]
-#     }
+  # ASG + Launch Template 정의
+  lanch_templates = {
+    "front-blue" = {
+      ami                  = var.ami_id
+      instance_type        = "t3.small"
+      key_name             = var.key_name
+      user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
+      security_group_ids   = [module.application_sg.security_group_id]
+      iam_instance_profile = module.iam.ec2_iam_instance_profile_name
+      alb_target_group_arn = module.alb_envs.tg_front_blue_arn
+      subnet_id            = data.terraform_remote_state.infra.outputs.private_subnet_ids[0]
+    }
 
-#     "back-blue" = {
-#       ami                  = var.ami_id
-#       instance_type        = "t3.medium"
-#       key_name             = var.key_name
-#       user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
-#       security_group_ids   = [module.application_sg.security_group_id]
-#       iam_instance_profile = module.iam.ec2_iam_instance_profile_name
-#       alb_target_group_arn = module.alb_envs.tg_back_blue_arn
-#       subnet_id            = data.terraform_remote_state.infra.outputs.private_subnet_ids[0]
-#     }
-#   }
+    "back-blue" = {
+      ami                  = var.ami_id
+      instance_type        = "t3.medium"
+      key_name             = var.key_name
+      user_data            = base64encode(file("../../modules/compute/scripts/init_userdata.sh"))
+      security_group_ids   = [module.application_sg.security_group_id]
+      iam_instance_profile = module.iam.ec2_iam_instance_profile_name
+      alb_target_group_arn = module.alb_envs.tg_back_blue_arn
+      subnet_id            = data.terraform_remote_state.infra.outputs.private_subnet_ids[0]
+    }
+  }
 
 
-#   common_tags = local.common_tags
-#   name_prefix = local.name_prefix
-# }
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
 
 module "route53_private" {
   source = "../../modules/route53_private"

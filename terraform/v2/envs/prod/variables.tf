@@ -237,3 +237,8 @@ variable "spring_prod_code_deploy_bucket_arn" {
   description = "ARN of the S3 bucket for spring prod code deploy"
   type        = string
 }
+
+variable "db_ec2_private_dns" {
+  description =  "Private DNS of the DB EC2 instance"
+  type        = string
+}
