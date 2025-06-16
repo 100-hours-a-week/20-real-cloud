@@ -23,30 +23,7 @@ resource "aws_instance" "ec2" {
   )
 }
 
-resource "aws_eip" "ec2_eip" {
-  for_each = {
-    for key, value in var.ec2_instances : key => value
-    if value.use_eip
-  }
-
-  tags = merge(
-    local.default_tags,
-    {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-eip-${each.key}"
-    }
-  )
-}
-
-# EIP 연결
-resource "aws_eip_association" "ec2_eip" {
-  for_each = aws_eip.ec2_eip
-
-  instance_id   = aws_instance.ec2[each.key].id
-  allocation_id = each.value.id
-
-}
-
-#Lanch template
+#Launch template
 resource "aws_launch_template" "this" {
   for_each = var.lanch_templates
 

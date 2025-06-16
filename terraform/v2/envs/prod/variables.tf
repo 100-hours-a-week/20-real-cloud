@@ -1,73 +1,56 @@
-# Network
-variable "is_infra_env" {
-  description = "Is this environment an infra environment?"
-  type        = bool
-}
-
-variable "vpc_cidr_block" {
-  description = "VPC CIDR block to which AWS Resources belong"
-  type        = string
-}
-
-variable "public_subnet_cidr_blocks" {
-  description = "Public Subnet CIDR blocks belonging to the VPC"
-  type        = list(string)
-}
-
-variable "private_subnet_cidr_blocks" {
-  description = "Private Subnet CIDR blocks belonging to the VPC"
-  type        = list(string)
-}
-
-variable "availability_zones" {
-  description = "Availability Zone where public subnet exist"
-  type        = list(string)
-}
-
-variable "private_subnet_names" {
-  description = "Private Subnet Names (App or DB)"
-  type        = list(string)
-}
-
-variable "create_nat_gateway" {
-  description = "Create NAT Gateway when this variable is true (In Prod Environment)"
-  type        = bool
-}
-
-# Monitoring
-variable "front_service_name" {
-  description = "Frontend Service Name"
-  type        = string
-}
-
-variable "back_service_name" {
-  description = "Backend Service Name"
-  type        = string
-}
-
-variable "db_service_name" {
-  description = "Database Service Name"
-  type        = string
-}
-
-variable "retention_in_days" {
-  description = "Number of days to retain the logs in CloudWatch"
+# ALB_ENV
+variable "https_front_listener_rule_priority" {
+  description = "priority of frontend listener rule"
   type        = number
 }
 
-variable "front_log_group_names" {
-  description = "Frontend Log group names"
-  type        = list(string)
+variable "https_back_listener_rule_priority" {
+  description = "priority of backend listener rule"
+  type        = number
 }
 
-variable "back_log_group_names" {
-  description = "Backend Log group names"
-  type        = list(string)
+variable "https_ws_listener_rule_priority" {
+  description = "priority of websocket listener rule"
+  type        = number
 }
 
-variable "db_log_group_names" {
-  description = "Database Log group names"
-  type        = list(string)
+variable "http_metric_listener_rule_priority" {
+  description = "priority of metric listener rule"
+  type        = number
+}
+
+variable "host_header_values" {
+  description = "host header values (dev/prod environment)"
+  type = object({
+    ws    = list(string)
+    front = list(string)
+    back  = list(string)
+  })
+}
+
+variable "back_target_group_port" {
+  description = "port number of backend target group"
+  type        = number
+}
+
+variable "front_target_group_port" {
+  description = "port number of frontend target group"
+  type        = number
+}
+
+variable "ws_target_group_port" {
+  description = "port number of websocket target group"
+  type        = number
+}
+
+variable "metric_target_group_port" {
+  description = "port number of metric target group"
+  type        = number
+}
+
+variable "ap_acm_certificate_arn" {
+  description = "ARN of the ACM certificate"
+  type        = string
 }
 
 #compute
@@ -76,11 +59,36 @@ variable "ami_id" {
   type        = string
 }
 
+variable "db_ami_id" {
+  description = "The AMI ID for the database instance."
+  type        = string
+}
+
+variable "monitoring_ami_id" {
+  description = "The AMI ID for the monitoring instance."
+  type        = string
+}
+
 variable "key_name" {
   description = "The key pair name to use for SSH access."
   type        = string
 }
 
+# Route53
+variable "apex_domain_name" {
+  description = "The Apex domain name to associate with the CloudFront distribution"
+  type        = string
+}
+
+variable "private_zone_id" {
+  description = "The Private Route 53 Zone ID"
+  type        = string
+}
+
+variable "db_ec2_private_dns_name" {
+  description = "The Private DNS name of the DB EC2 instance"
+  type        = string
+}
 
 #security groups
 variable "ec2_ingress_rules" {
@@ -96,30 +104,6 @@ variable "ec2_ingress_rules" {
 }
 
 variable "ec2_egress_rules" {
-  description = "Security Group's Egress rules"
-  type = list(object({
-    description = string
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
-  }))
-  default = []
-}
-
-variable "alb_ingress_rules" {
-  description = "Security Group's Ingress rules"
-  type = list(object({
-    description = string
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
-  }))
-  default = []
-}
-
-variable "alb_egress_rules" {
   description = "Security Group's Egress rules"
   type = list(object({
     description = string
@@ -203,16 +187,6 @@ variable "monitoring_egress_rules" {
   default = []
 }
 
-#cdn
-variable "us_acm_certificate_arn" {
-  description = "The ARN of the ACM certificate to use for HTTPS"
-  type        = string
-}
-variable "ap_acm_certificate_arn" {
-  description = "The ARN of the ACM certificate to use for HTTPS"
-  type        = string
-}
-
 # Tags
 variable "name_prefix" {
   description = "Name tag's prefix"
@@ -250,5 +224,16 @@ variable "static_bucket_arn" {
 }
 variable "log_bucket_arn" {
   description = "ARN of the S3 bucket for log files"
+  type        = string
+}
+
+#codedeploy
+variable "next_prod_code_deploy_bucket_arn" {
+  description = "ARN of the S3 bucket for next prod code deploy"
+  type        = string
+}
+
+variable "spring_prod_code_deploy_bucket_arn" {
+  description = "ARN of the S3 bucket for spring prod code deploy"
   type        = string
 }

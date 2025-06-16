@@ -1,52 +1,69 @@
 module "network" {
   source = "../../modules/network"
 
-  is_infra_env               = var.is_infra_env
-  internet_gateway_id        = var.internet_gateway_id
-  vpc_id                     = var.vpc_id
-  vpc_cidr_block             = var.vpc_cidr_block
-  public_subnet_cidr_blocks  = var.public_subnet_cidr_blocks
-  private_subnet_cidr_blocks = var.private_subnet_cidr_blocks
-  availability_zones         = var.availability_zones
-  private_subnet_names       = var.private_subnet_names
-  create_nat_gateway         = var.create_nat_gateway
-  nat_gateway_id             = var.nat_gateway_id
+  vpc_cidr_block              = var.vpc_cidr_block
+  public_subnet_cidr_blocks   = var.public_subnet_cidr_blocks
+  private_subnet_cidr_blocks  = var.private_subnet_cidr_blocks
+  availability_zones          = var.availability_zones
+  private_subnet_names        = var.private_subnet_names
+  public_subnet_environments  = var.public_subnet_environments
+  private_subnet_environments = var.private_subnet_environments
+  enable_natgw                = var.enable_natgw
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
 
-module "ecr" {
-  source = "../../modules/registry"
+module "alb_sg" {
+  source = "../../modules/security_group"
+
+  vpc_id = module.network.vpc_id
+
+  ingress_rules = var.alb_ingress_rules
+  egress_rules  = var.alb_egress_rules
 
   common_tags = local.common_tags
   name_prefix = local.name_prefix
 }
 
-# module "codedeploy_next" {
-#   source                = "../../modules/codedeploy"
-#   app_name              = "next"
-#   deployment_group_name = "next-bluegreen"
-#   service_role_arn      = aws_iam_role.codedeploy.arn
-#   target_group_blue     = aws_lb_target_group.next_blue.arn
-#   target_group_green    = aws_lb_target_group.next_green.arn
-#   listener_arn          = aws_lb_listener.frontend.arn
-#   auto_scaling_groups   = [aws_autoscaling_group.next_asg.name]
+module "alb_infra" {
+  source = "../../modules/alb_infra"
 
-#   common_tags = local.common_tags
-#   name_prefix = local.name_prefix
-# }
+  subnet_ids          = [module.network.public_subnet_ids[0], module.network.public_subnet_ids[1], module.network.public_subnet_ids[2]]
+  security_group_id   = module.alb_sg.security_group_id
+  target_group_vpc_id = module.network.vpc_id
+  certificate_arn     = var.ap_acm_certificate_arn
 
-# module "codedeploy_springboot" {
-#   source                = "../../modules/codedeploy"
-#   app_name              = "springboot"
-#   deployment_group_name = "springboot-bluegreen"
-#   service_role_arn      = aws_iam_role.codedeploy.arn
-#   target_group_blue     = aws_lb_target_group.spring_blue.arn
-#   target_group_green    = aws_lb_target_group.spring_green.arn
-#   listener_arn          = aws_lb_listener.frontend.arn
-#   auto_scaling_groups   = [aws_autoscaling_group.spring_asg.name]
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
 
-#   common_tags = local.common_tags
-#   name_prefix = local.name_prefix
-# }
+module "cdn" {
+  source = "../../modules/cdn"
+
+  alb_dns_name                = module.alb_infra.alb_dns_name
+  bucket_regional_domain_name = var.bucket_regional_domain_name
+  acm_certificate_arn         = var.us_acm_certificate_arn
+  apex_domain_name            = var.apex_domain_name
+  oac_id                      = var.oac_id
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+
+module "route53_public" {
+  source = "../../modules/route53_public"
+
+  apex_domain_name       = var.apex_domain_name
+  alb_dns_name           = module.alb_infra.alb_dns_name
+  alb_zone_id            = module.alb_infra.alb_zone_id
+  public_zone_id         = var.public_zone_id
+  cloudfront_domain_name = module.cdn.cloudfront_domain_name
+  ai_ip_address          = var.ai_ip_address
+  acm_cname_name         = var.acm_cname_name
+  acm_cname_value        = var.acm_cname_value
+
+  common_tags = local.common_tags
+  name_prefix = local.name_prefix
+}
+

@@ -8,16 +8,6 @@ variable "security_group_id" {
   type        = string
 }
 
-variable "back_target_group_port" {
-  description = "port number of target group"
-  type        = number
-}
-
-variable "front_target_group_port" {
-  description = "port number of target group"
-  type        = number
-}
-
 variable "target_group_vpc_id" {
   description = "VPC ID of target group"
   type        = string
@@ -32,7 +22,7 @@ variable "certificate_arn" {
 variable "module_name" {
   description = "Module name used for Module tag"
   type        = string
-  default     = "cdn"
+  default     = "alb"
 }
 
 variable "common_tags" {
