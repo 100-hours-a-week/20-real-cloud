@@ -1,0 +1,48 @@
+name: Infra Apply + Lambda Trigger
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 09:00 KST
+    - cron: '0 13 * * *'  # 22:00 KST
+  workflow_dispatch: 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/v2/envs/infra
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply (Enable NAT for morning)
+        run: |
+          HOUR=$(date -u +"%H")
+          if [ "$HOUR" -eq "0" ]; then
+            terraform apply -auto-approve
+          else
+            terraform apply -auto-approve -var="enable_natgw=false"
+          fi
+
+  lambda_trigger:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invoke Lambda (mode=startup/shutdown)
+        run: |
+          HOUR=$(date -u +"%H")
+          MODE="shutdown"
+          if [ "$HOUR" -eq "0" ]; then
+            MODE="startup"
+          fi
+
+          curl -X POST "${{secrets.API_GATEWAY}}/lambda-trigger" \
+               -H "Content-Type: application/json" \
+               -d "{\"mode\": \"${MODE}\"}"
