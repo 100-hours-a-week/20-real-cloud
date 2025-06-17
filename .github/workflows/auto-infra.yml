@@ -2,7 +2,7 @@ name: Infra Apply + Lambda Trigger
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # 09:00 KST (NAT ON)
+    - cron: '30 23 * * *'  # 08:30 KST (NAT ON)
     - cron: '0 13 * * *'  # 22:00 KST (NAT OFF)
   workflow_dispatch:
 
@@ -35,10 +35,11 @@ jobs:
 
       - name: Terraform Apply (NAT ON/OFF with submodule tfvars)
         run: |
+
           HOUR=$(date -u +"%H")
           NAT_ENABLED="false"
-          if [ "$HOUR" -eq "0" ]; then
-            NAT_ENABLED="true"
+          if [ "$HOUR" -eq "23" ]; then
+          NAT_ENABLED="true"
           fi
 
           terraform apply \
@@ -51,14 +52,17 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
+
+
       - name: Invoke Lambda (mode=startup/shutdown)
         run: |
           HOUR=$(date -u +"%H")
           MODE="shutdown"
-          if [ "$HOUR" -eq "0" ]; then
+          if [ "$HOUR" -eq "23" ]; then
             MODE="startup"
           fi
-
+      
           curl -X POST "${{ secrets.API_GATEWAY }}/lambda-trigger" \
                -H "Content-Type: application/json" \
                -d "{\"mode\": \"${MODE}\"}"
+      
