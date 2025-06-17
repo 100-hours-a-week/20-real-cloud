@@ -46,6 +46,7 @@ jobs:
             -target=module.nat \
             -var-file=../../../../terraform-properties/v2/infra_terraform.tfvars \
             -var="enable_natgw=${NAT_ENABLED}"
+            -var="assignee_tag=github"
 
   lambda_trigger:
     needs: deploy
