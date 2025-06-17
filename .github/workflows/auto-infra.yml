@@ -44,7 +44,7 @@ jobs:
           terraform apply \
             -auto-approve \
             -target=module.nat \
-            -var-file=../../../terraform-properties/v2/infra_terraform.tfvars \
+            -var-file=../../../../terraform-properties/v2/infra_terraform.tfvars \
             -var="enable_natgw=${NAT_ENABLED}"
 
   lambda_trigger:
