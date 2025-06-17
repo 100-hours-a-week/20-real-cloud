@@ -2,9 +2,9 @@ name: Infra Apply + Lambda Trigger
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # 09:00 KST
-    - cron: '0 13 * * *'  # 22:00 KST
-  workflow_dispatch: 
+    - cron: '0 0 * * *'   # 09:00 KST (NAT ON)
+    - cron: '0 13 * * *'  # 22:00 KST (NAT OFF)
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -14,7 +14,17 @@ jobs:
         working-directory: terraform/v2/envs/infra
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout with submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -22,14 +32,19 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Apply (Enable NAT for morning)
+      - name: Terraform Apply (NAT ON/OFF with submodule tfvars)
         run: |
           HOUR=$(date -u +"%H")
+          NAT_ENABLED="false"
           if [ "$HOUR" -eq "0" ]; then
-            terraform apply -auto-approve
-          else
-            terraform apply -auto-approve -var="enable_natgw=false"
+            NAT_ENABLED="true"
           fi
+
+          terraform apply \
+            -auto-approve \
+            -target=module.nat \
+            -var-file=../../../terraform-properties/v2/infra_terraform.tfvars \
+            -var="enable_natgw=${NAT_ENABLED}"
 
   lambda_trigger:
     needs: deploy
@@ -43,6 +58,6 @@ jobs:
             MODE="startup"
           fi
 
-          curl -X POST "${{secrets.API_GATEWAY}}/lambda-trigger" \
+          curl -X POST "${{ secrets.API_GATEWAY }}/lambda-trigger" \
                -H "Content-Type: application/json" \
                -d "{\"mode\": \"${MODE}\"}"
