@@ -91,11 +91,14 @@ resource "aws_lb_listener" "https" {
   certificate_arn   = var.certificate_arn
 
   default_action {
-    type           = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "잘못된 경로 입니다..."
-      status_code  = "404"
+    type = "redirect"
+    redirect {
+      protocol   = "HTTPS"
+      port       = "443"
+      status_code = "HTTP_301"
+      host       = "www.#{host}"
+      path       = "/#{path}"
+      query      = "#{query}"
     }
   }
 
