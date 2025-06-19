@@ -3,10 +3,10 @@ output "vpc_id" {
   value       = module.network.vpc_id
 }
 
-output "alb_arn" {
-  description = "ALB ARN"
-  value       = module.alb_infra.alb_arn
-}
+# output "alb_arn" {
+#   description = "ALB ARN"
+#   value       = module.alb_infra.alb_arn
+# }
 
 output "public_subnet_ids" {
   description = "Public Subnet IDs"
@@ -23,12 +23,12 @@ output "private_subnet_ids" {
 #   value       = module.route53_public.public_zone_id
 # }
 
-output "https_listener_arn" {
-  description = "HTTPS Listener ARN"
-  value       = module.alb_infra.https_listener_arn
-}
+# output "https_listener_arn" {
+#   description = "HTTPS Listener ARN"
+#   value       = module.alb_infra.https_listener_arn
+# }
 
-output "http_listener_arn" {
-  description = "HTTP Listener ARN"
-  value       = module.alb_infra.http_listener_arn
-}
+# output "http_listener_arn" {
+#   description = "HTTP Listener ARN"
+#   value       = module.alb_infra.http_listener_arn
+# }

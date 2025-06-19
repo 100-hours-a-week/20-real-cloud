@@ -26,44 +26,44 @@ module "alb_sg" {
   name_prefix = local.name_prefix
 }
 
-module "alb_infra" {
-  source = "../../modules/alb_infra"
+# module "alb_infra" {
+#   source = "../../modules/alb_infra"
 
-  subnet_ids          = [module.network.public_subnet_ids[0], module.network.public_subnet_ids[1], module.network.public_subnet_ids[2]]
-  security_group_id   = module.alb_sg.security_group_id
-  target_group_vpc_id = module.network.vpc_id
-  certificate_arn     = var.ap_acm_certificate_arn
+#   subnet_ids          = [module.network.public_subnet_ids[0], module.network.public_subnet_ids[1], module.network.public_subnet_ids[2]]
+#   security_group_id   = module.alb_sg.security_group_id
+#   target_group_vpc_id = module.network.vpc_id
+#   certificate_arn     = var.ap_acm_certificate_arn
 
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }
 
-module "cdn" {
-  source = "../../modules/cdn"
+# module "cdn" {
+#   source = "../../modules/cdn"
 
-  alb_dns_name                = module.alb_infra.alb_dns_name
-  bucket_regional_domain_name = var.bucket_regional_domain_name
-  acm_certificate_arn         = var.us_acm_certificate_arn
-  apex_domain_name            = var.apex_domain_name
-  oac_id                      = var.oac_id
+#   alb_dns_name                = module.alb_infra.alb_dns_name
+#   bucket_regional_domain_name = var.bucket_regional_domain_name
+#   acm_certificate_arn         = var.us_acm_certificate_arn
+#   apex_domain_name            = var.apex_domain_name
+#   oac_id                      = var.oac_id
 
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }
 
-module "route53_public" {
-  source = "../../modules/route53_public"
+# module "route53_public" {
+#   source = "../../modules/route53_public"
 
-  apex_domain_name       = var.apex_domain_name
-  alb_dns_name           = module.alb_infra.alb_dns_name
-  alb_zone_id            = module.alb_infra.alb_zone_id
-  public_zone_id         = var.public_zone_id
-  cloudfront_domain_name = module.cdn.cloudfront_domain_name
-  ai_ip_address          = var.ai_ip_address
-  acm_cname_name         = var.acm_cname_name
-  acm_cname_value        = var.acm_cname_value
+#   apex_domain_name       = var.apex_domain_name
+#   alb_dns_name           = module.alb_infra.alb_dns_name
+#   alb_zone_id            = module.alb_infra.alb_zone_id
+#   public_zone_id         = var.public_zone_id
+#   cloudfront_domain_name = module.cdn.cloudfront_domain_name
+#   ai_ip_address          = var.ai_ip_address
+#   acm_cname_name         = var.acm_cname_name
+#   acm_cname_value        = var.acm_cname_value
 
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }
 
