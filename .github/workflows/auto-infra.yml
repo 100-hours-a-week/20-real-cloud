@@ -31,7 +31,9 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init
-        run: terraform init
+        run: |
+          rm -rf .terraform
+          terraform init -reconfigure
 
       - name: Terraform Apply (NAT ON/OFF with submodule tfvars)
         run: |
