@@ -32,8 +32,7 @@ jobs:
 
       - name: Terraform Init
         run: |
-          rm -rf .terraform
-          terraform init -reconfigure
+          terraform init
 
       - name: Terraform Apply (NAT ON/OFF with submodule tfvars)
         run: |

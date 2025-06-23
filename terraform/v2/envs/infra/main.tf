@@ -14,17 +14,17 @@ module "network" {
   name_prefix = local.name_prefix
 }
 
-module "alb_sg" {
-  source = "../../modules/security_group"
+# module "alb_sg" {
+#   source = "../../modules/security_group"
 
-  vpc_id = module.network.vpc_id
+#   vpc_id = module.network.vpc_id
 
-  ingress_rules = var.alb_ingress_rules
-  egress_rules  = var.alb_egress_rules
+#   ingress_rules = var.alb_ingress_rules
+#   egress_rules  = var.alb_egress_rules
 
-  common_tags = local.common_tags
-  name_prefix = local.name_prefix
-}
+#   common_tags = local.common_tags
+#   name_prefix = local.name_prefix
+# }
 
 # module "alb_infra" {
 #   source = "../../modules/alb_infra"
