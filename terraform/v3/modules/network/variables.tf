@@ -1,0 +1,72 @@
+variable "vpc_cidr_block" {
+  description = "VPC CIDR block to which EC2 instance belongs"
+  type        = string
+}
+
+variable "public_subnet_cidr_blocks" {
+  description = "Public Subnet CIDR blocks belonging to the VPC"
+  type        = list(string)
+}
+
+variable "private_subnet_cidr_blocks" {
+  description = "Private Subnet CIDR blocks belonging to the VPC"
+  type        = list(string)
+}
+
+variable "availability_zones" {
+  description = "Availability Zone where public subnet exist"
+  type        = list(string)
+}
+
+variable "public_subnet_environments" {
+  description = "Environment (dev/prod) for each public subnet"
+  type        = list(string)
+}
+
+variable "private_subnet_environments" {
+  description = "Environment (dev/prod) for each private subnet"
+  type        = list(string)
+}
+
+variable "private_subnet_names" {
+  description = "List of private subnet name labels"
+  type        = list(string)
+}
+
+variable "is_shared" {
+  description = "Is shared network"
+  type        = bool
+  default     = false
+}
+
+variable "enable_natgw" {
+  description = "Enable NAT Gateway"
+  type        = bool
+}
+
+# Tags
+variable "module_name" {
+  description = "Module name used for Module tag"
+  type        = string
+  default     = "network"
+}
+
+variable "common_tags" {
+  description = "Common Tags"
+  type        = map(string)
+}
+
+variable "name_prefix" {
+  description = "Name tag's prefix"
+  type        = string
+}
+
+variable "az_name_map" {
+  type = map(string)
+  default = {
+    "ap-northeast-2a" = "Azone"
+    "ap-northeast-2b" = "Bzone"
+    "ap-northeast-2c" = "Czone"
+  }
+}
+
