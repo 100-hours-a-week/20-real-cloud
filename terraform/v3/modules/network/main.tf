@@ -30,7 +30,8 @@ resource "aws_subnet" "public" {
   tags = merge(
     local.default_tags,
     {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-public-subnet-${var.az_name_map[var.availability_zones[count.index]]}"
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-public-subnet-${var.az_name_map[var.availability_zones[count.index]]}",
+      "kubernetes.io/role/elb" = "1"
     }
   )
 }
@@ -45,6 +46,7 @@ resource "aws_subnet" "private" {
     local.default_tags,
     {
       Name = "${var.name_prefix}-${var.common_tags.Environment}-private-subnet-${var.private_subnet_names[count.index]}-${var.az_name_map[var.availability_zones[count.index % length(var.availability_zones)]]}"
+      "kubernetes.io/role/internal-elb" = "1"
     }
   )
 }
@@ -79,7 +81,7 @@ resource "aws_route_table" "public" {
   tags = merge(
     local.default_tags,
     {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-public-route-table"
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-public-route-table",
     }
   )
 }
@@ -108,7 +110,7 @@ resource "aws_route_table" "private" {
   tags = merge(
     local.default_tags,
     {
-      Name = "${var.name_prefix}-${var.common_tags.Environment}-private-route-table"
+      Name = "${var.name_prefix}-${var.common_tags.Environment}-private-route-table",
     }
   )
 }
