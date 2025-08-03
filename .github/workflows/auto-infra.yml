@@ -1,9 +1,6 @@
 name: Infra Apply + Lambda Trigger
 
 on:
-  schedule:
-    - cron: '30 23 * * *'  # 08:30 KST (NAT ON)
-    - cron: '0 13 * * *'  # 22:00 KST (NAT OFF)
   workflow_dispatch:
 
 jobs:
